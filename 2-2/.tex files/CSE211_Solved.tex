@@ -344,7 +344,7 @@ Trace what each state ``remembers''.
 \item From the start, $a$ leads to the only accepting state; from there $b$ returns to the start and $a$ falls (via an extra state) into the trap. Accepted strings are therefore $a$, $aba$, $ababa,\dots$
 \ans{$L_1=(ab)^*a$: strings that alternate $a,b$, starting and ending with $a$.}
 \item The upper branch reads $a^+$ then a single $b$ to accept; the lower branch accepts the single symbol $b$. Any further symbol goes to the trap.
-\ans{$L_2=a^*b=\{a^nb\mid n\ge 0\}$.}
+\ans{$L_2$ = any number of $a$'s (possibly none) followed by exactly one $b$, which is the last symbol; i.e.\ strings with exactly one $b$, at the end. In symbols: $a^*b=\{a^nb\mid n\ge 0\}$.}
 \item Think of $a$ as ``('' and $b$ as ``)''. The three non-trap states record the current depth $0,1,2$; a third unmatched $a$ (depth 3) or a $b$ at depth 0 goes to the trap, and we accept at depth 0.
 \ans{$L_3=(a(ab)^*b)^*$: strings with equally many $a$'s and $b$'s in which every prefix satisfies $0\le \#_a-\#_b\le 2$ (balanced ``parentheses'' of nesting depth at most 2).}
 \item From the centre (accepting) state the machine must read either $ab$ or $ba$ to return; $aa$ or $bb$ inside a block leads to the trap.
@@ -532,11 +532,11 @@ The figure omits the moves that lead nowhere; by convention every missing move g
 $F_1=(\{a,b,c,d,e,t\},\{0,1\},\delta,a,\{c,e\})$ with
 \begin{center}\small\begin{tabular}{c|cc}\toprule $\delta$&0&1\\\midrule $\to a$&$b$&$d$\\ $b$&$b$&$c$\\ $*c$&$t$&$t$\\ $d$&$e$&$t$\\ $*e$&$t$&$t$\\ $t$&$t$&$t$\\\bottomrule\end{tabular}\end{center}
 
-\textbf{(b)} Via $b$: one or more 0's then a 1; via $d$: exactly $10$.
-\ans{$L(F_1)=0^+1\ \cup\ \{10\}=\{0^n1\mid n\ge1\}\cup\{10\}$ (an infinite language).}
+\textbf{(b)} There are only two ways to reach an accepting state. Through $b$ the machine reads one or more 0's (the loop on $b$) and then a single 1, after which any further symbol leads to the trap. Through $d$ it reads 1 and then 0, and again nothing more may follow. So $F_1$ accepts the string $10$, together with every string made of one or more 0's followed by exactly one 1, where that 1 is the last symbol (e.g.\ $01, 001, 0001$). It rejects strings such as $0101$: they start with 0 and end with 01, but contain a second 1.
+\ans{$L(F_1)$ = the string $10$, or one or more 0's followed by a single final 1. In symbols: $0^+1\cup\{10\}=\{0^n1\mid n\ge1\}\cup\{10\}$ (an infinite language).}
 
-\textbf{(c)} The loop on $d$ allows any number of 1's before the final 0.
-\ans{$L(F_2)=0^+1\ \cup\ 1^+0$.}
+\textbf{(c)} The new loop on $d$ lets the machine read any number of extra 1's before the final 0, so the lower path now accepts one or more 1's followed by a single 0. The upper path is unchanged. The two parts mirror each other: a string is accepted iff it has length at least 2, all of its symbols except the last are the same, and the last symbol is the other one.
+\ans{$L(F_2)$ = one or more 0's followed by a single 1, or one or more 1's followed by a single 0. In symbols: $0^+1\cup1^+0$.}
 
 \textbf{(d)} \emph{Yes, it is possible.} Simply make the start state $a$ accepting. No state or transition is added or removed, and $L(F_3)=L(F_1)\cup\{\eps\}$: exactly one extra string. (Even read purely as cardinalities the claim is consistent: $|L(F_1)|=\aleph_0$ and $\aleph_0+1=\aleph_0$.)
 \end{solution}
@@ -4087,11 +4087,26 @@ This is the PDA of 2010--11 Q13(a). The middle move reads nothing (even length) 
 
 %-------------------------------------------------------------------
 \begin{question}{2009--2010 \textbullet\ Q10(b)}{Source M09--M10}{3 + 6$\tfrac13$ = 9$\tfrac13$}
-For the same PDA $P=(\{p,q\},\{0,1\},\{Z,X\},\delta,q,Z,\{p\})$ (with $Z$ for $Z_0$): (i) represent $P$ by a transition diagram; (ii) convert it to a PDA accepting by empty stack the same language it accepts by final state.
+Suppose the PDA $P=(\{p,q\},\{0,1\},\{Z,X\},\delta,q,Z,\{p\})$ has the following transition functions:
+\[\begin{array}{l}
+\delta(q,0,Z)=\{(q,XZ)\}\\
+\delta(q,0,X)=\{(q,XX)\}\\
+\delta(q,1,X)=\{(q,X)\}\\
+\delta(q,\eps,X)=\{(p,\eps)\}\\
+\delta(p,\eps,X)=\{(p,\eps)\}\\
+\delta(p,1,X)=\{(p,XX)\}\\
+\delta(p,1,Z)=\{(p,\eps)\}
+\end{array}\]
+(i) Represent $P$ by a transition diagram. (ii) Convert $P$ to a PDA accepting by empty stack the same language that $P$ accepts by final state. ($Z$ plays the role of $Z_0$.)
 \end{question}
 \begin{solution}
 \sub{(i) Transition diagram}
-Same diagram as 2015--2016 Q5(a) above, with $Z$ written for $Z_0$.
+One arc label per rule of $\delta$ (start state $q$, final state $p$, $Z$ initially on the stack):
+\fig{\begin{tikzpicture}[pda,node distance=42mm]
+ \node[state,initial] (q) {$q$}; \node[state,accepting] (p) [right=of q] {$p$};
+ \path (q) edge[loop above] node[align=center] {\tr0Z{XZ}\\ \tr0X{XX}\\ \tr1XX} ()
+  (q) edge node {\tr\eps X\eps} (p) (p) edge[loop above] node[align=center] {\tr\eps X\eps\\ \tr1X{XX}\\ \tr1Z\eps} ();
+\end{tikzpicture}}
 
 \sub{(ii) Conversion to empty-stack acceptance}
 Apply the $P_F\to P_N$ construction from 2019--20 Q10(a) above. New states $p_0$ (start) and $e$ (eraser), new bottom symbol $X_0$:
@@ -4350,40 +4365,23 @@ Every split fails for $i=2$, contradicting the pumping lemma. Hence $L$ is not c
 Design a TM comparing binary $w_1$ and $w_2$. Initially the tape is $w_1cw_2c$. Write 0 after the second $c$ if equal and 1 otherwise. You may assume equal lengths and use multiple tracks and state storage.
 \end{question}
 \begin{solution}
-\textbf{Idea.} Repeatedly take the leftmost unchecked bit $b$ of $w_1$, store it in the state ($r_b=[r,b]$), check it off on the second track ($0\mapsto x=[\ast,0]$, $1\mapsto y=[\ast,1]$), walk to the leftmost unchecked bit of $w_2$ and compare. If they are equal, check that bit too and return; on a mismatch, walk to the cell after the second $c$ and write 1. If every bit of $w_1$ is checked (the head reaches the first $c$), all pairs matched: write 0 after the second $c$.
-
-$M=(\{q_0,r_0,r_1,s_0,s_1,k_1,k_2,e,n,z_0,z_1,h\},\{0,1,c\},\{0,1,c,x,y,B\},\delta,q_0,B,\{h\})$ with $\delta$:
-\begin{center}\small\begin{tabular}{l|cccccc|l}\toprule
-State & 0 & 1 & $x$ & $y$ & $c$ & $B$ & meaning\\\midrule
-$\to q_0$ & $(r_0,x,R)$ & $(r_1,y,R)$ & & & $(e,c,R)$ & & next bit of $w_1$\\
-$r_0$ & $(r_0,0,R)$ & $(r_0,1,R)$ & & & $(s_0,c,R)$ & & carry 0 to $w_2$\\
-$r_1$ & $(r_1,0,R)$ & $(r_1,1,R)$ & & & $(s_1,c,R)$ & & carry 1 to $w_2$\\
-$s_0$ & $(k_1,x,L)$ & $(n,1,R)$ & $(s_0,x,R)$ & $(s_0,y,R)$ & & & compare with 0\\
-$s_1$ & $(n,0,R)$ & $(k_1,y,L)$ & $(s_1,x,R)$ & $(s_1,y,R)$ & & & compare with 1\\
-$k_1$ & $(k_1,0,L)$ & $(k_1,1,L)$ & $(k_1,x,L)$ & $(k_1,y,L)$ & $(k_2,c,L)$ & & back to first $c$\\
-$k_2$ & $(k_2,0,L)$ & $(k_2,1,L)$ & $(q_0,x,R)$ & $(q_0,y,R)$ & & & to last check in $w_1$\\
-$e$ & & & $(e,x,R)$ & $(e,y,R)$ & $(z_0,c,R)$ & & all equal\\
-$n$ & $(n,0,R)$ & $(n,1,R)$ & $(n,x,R)$ & $(n,y,R)$ & $(z_1,c,R)$ & & mismatch\\
-$z_0$ & & & & & & $(h,0,R)$ & write 0\\
-$z_1$ & & & & & & $(h,1,R)$ & write 1\\
-$*h$ & & & & & & & halt\\\bottomrule
-\end{tabular}\end{center}
-$h$ has no moves, so $M$ halts there. In the slides' notation ($r_b=[r,b]$, $s_b=[s,b]$; an unchecked bit $a$ is $[B,a]$, a checked one $[\ast,a]$, $c=[B,c]$, the blank $[B,B]$; $a,b\in\{0,1\}$, $\bar a=1-a$):
-\par\noindent\textbf{Transition rules (numbered as in the slides):}
+\textbf{Formal notation.} State storage $[q,a,d]$ ($a$ = the bit of $w_1$ being carried, $d$ = the result so far, $0$ = equal) and two tracks $[t,X]$ ($t\in\{B,\ast\}$ is the check mark, $X\in\{0,1,c,B\}$ the symbol). $M=(Q,\Sigma,\Gamma,\delta,[q_0,B,0],[B,B],\{[q_6,B,B]\})$ with input symbols $[B,0],[B,1],[B,c]$. The start state is $[q_0,B,0]$; the final state $[q_6,B,B]$ has no moves, so $M$ halts there after writing the answer (it computes by halting). Here $a,b\in\{0,1\}$ and $\bar a=1-a$.
+\par\noindent\textbf{Transition rules:}
 {\small\begin{enumerate}[label=\arabic*.,itemsep=0pt]
-\item $\delta(q_0,[B,a])=([r,a],[\ast,a],R)$ --- check the next bit of $w_1$ and store it.
-\item $\delta([r,a],[B,b])=([r,a],[B,b],R)$; \ $\delta([r,a],[B,c])=([s,a],[B,c],R)$ --- go right past the first $c$.
-\item $\delta([s,a],[\ast,b])=([s,a],[\ast,b],R)$ --- skip the checked bits of $w_2$.
-\item $\delta([s,a],[B,a])=(k_1,[\ast,a],L)$ --- equal bit: check it and turn back.
-\item $\delta([s,a],[B,\bar a])=(n,[B,\bar a],R)$ --- different bit: mismatch.
-\item $\delta(k_1,[t,b])=(k_1,[t,b],L)$ for $t\in\{B,\ast\}$; \ $\delta(k_1,[B,c])=(k_2,[B,c],L)$ --- back over $w_2$ to the first $c$.
-\item $\delta(k_2,[B,b])=(k_2,[B,b],L)$; \ $\delta(k_2,[\ast,b])=(q_0,[\ast,b],R)$ --- back to the last checked bit of $w_1$; next round.
-\item $\delta(q_0,[B,c])=(e,[B,c],R)$; \ $\delta(e,[\ast,b])=(e,[\ast,b],R)$; \ $\delta(e,[B,c])=(z_0,[B,c],R)$ --- $w_1$ used up, all bits equal: go past the second $c$.
-\item $\delta(n,[t,b])=(n,[t,b],R)$ for $t\in\{B,\ast\}$; \ $\delta(n,[B,c])=(z_1,[B,c],R)$ --- mismatch: go past the second $c$.
-\item $\delta(z_0,[B,B])=(h,[B,0],R)$; \ $\delta(z_1,[B,B])=(h,[B,1],R)$ --- write the answer and halt.
+\item $\delta([q_0,B,0],[B,a])=([q_1,a,0],[\ast,a],R)$
+\item $\delta([q_1,a,0],[B,b])=([q_1,a,0],[B,b],R)$
+\item $\delta([q_1,a,0],[B,c])=([q_2,a,0],[B,c],R)$
+\item $\delta([q_2,a,0],[\ast,b])=([q_2,a,0],[\ast,b],R)$
+\item $\delta([q_2,a,0],[B,a])=([q_3,B,0],[\ast,a],L)$
+\item $\delta([q_3,B,0],[\ast,b])=([q_3,B,0],[\ast,b],L)$
+\item $\delta([q_3,B,0],[B,c])=([q_4,B,0],[B,c],L)$
+\item $\delta([q_4,B,0],[B,0/1])=([q_4,B,0],[B,0/1],L)$
+\item $\delta([q_4,B,0],[\ast,0/1])=([q_0,B,0],[\ast,0/1],R)$
+\item $\delta([q_0,B,0],[B,c])=([q_5,B,0],[B,c],R)$
+\item $\delta([q_5,B,d],[\ast/B,0/1/c])=([q_5,B,d],[\ast/B,0/1/c],R)$ \quad $[d=0/1]$
+\item $\delta([q_5,B,d],[B,B])=([q_6,B,B],[B,d],R)$
+\item $\delta([q_2,a,0],[B,\bar a])=([q_5,B,1],[\ast,\bar a],R)$
 \end{enumerate}}
-
-\textbf{Example} $w_1=10$, $w_2=11$: tape \texttt{10c11c}. Round 1: check $1\mapsto y$ in $w_1$, carry 1 to $w_2$, its first unchecked bit is 1: equal, check it ($y$). Round 2: check $0\mapsto x$, carry 0, the next unchecked bit of $w_2$ is 1 $\Rightarrow$ state $n$ (that bit stays unchecked) $\Rightarrow$ $z_1$ writes 1. Final ID $\texttt{yxcy1c1}\,h\,B$, i.e.\ the tape is \texttt{yxcy1c1}. For \texttt{10c10c} the machine ends with \texttt{yxcyxc0}. (A last sweep can turn $x,y$ back into $0,1$ if required.)
 \end{solution}
 
 %-------------------------------------------------------------------
@@ -4391,42 +4389,20 @@ $h$ has no moves, so $M$ halts there. In the slides' notation ($r_b=[r,b]$, $s_b
 Design a TM computing bitwise NOT of binary $w$. Initially the tape is $wc$, with separator $c$. Insert the NOT of $w$ in binary after $c$ and terminate. Multiple tracks and state storage are allowed.
 \end{question}
 \begin{solution}
-For each bit of $w$ from left to right: check it ($x=[\ast,0]$, $y=[\ast,1]$), carry it in the state to the first blank after $c$, write its complement there, come back.
-\fig{\begin{tikzpicture}[tmd,node distance=30mm]
- \node[state,initial] (q0) {$q_0$};
- \node[state] (r0) [above right=8mm and 26mm of q0] {$r_0$}; \node[state] (r1) [below right=8mm and 26mm of q0] {$r_1$};
- \node[state] (u0) [right=of r0] {$u_0$}; \node[state] (u1) [right=of r1] {$u_1$};
- \node[state] (k1) [right=94mm of q0] {$k_1$}; \node[state] (k2) [right=of k1] {$k_2$}; \node[state,accepting] (h) [above=14mm of q0] {$h$};
- \path (q0) edge node {\tm0xR} (r0) (q0) edge node[swap,pos=.65] {\tm1yR} (r1) (q0) edge node {\tm ccR} (h)
-  (r0) edge[loop above] node {\tm00R, \tm11R} () (r1) edge[loop below] node {\tm00R, \tm11R} ()
-  (r0) edge node {\tm ccR} (u0) (r1) edge node[swap] {\tm ccR} (u1)
-  (u0) edge[loop above] node {\tm00R, \tm11R} () (u1) edge[loop below] node {\tm00R, \tm11R} ()
-  (u0) edge node[pos=.25] {\tm\blank1L} (k1) (u1) edge node[swap,pos=.25] {\tm\blank0L} (k1)
-  (k1) edge[loop below] node {\tm00L, \tm11L} () (k1) edge node {\tm ccL} (k2) (k2) edge[loop above] node {\tm00L, \tm11L} ()
-  (k2) edge[out=-90,in=-80,looseness=0.8] node {\tm xxR, \tm yyR} (q0);
-\end{tikzpicture}}
-Transition table ($r_b=[r,b]$, $u_b=[u,b]$; $x=[\ast,0]$, $y=[\ast,1]$):
-\begin{center}\small\begin{tabular}{l|cccccc}\toprule
-State & $0$ & $1$ & $c$ & $x$ & $y$ & $B$\\\midrule
-$\to q_0$ & $(r_0,x,R)$ & $(r_1,y,R)$ & $(h,c,R)$ &  &  & \\
-$r_0$ & $(r_0,0,R)$ & $(r_0,1,R)$ & $(u_0,c,R)$ &  &  & \\
-$r_1$ & $(r_1,0,R)$ & $(r_1,1,R)$ & $(u_1,c,R)$ &  &  & \\
-$u_0$ & $(u_0,0,R)$ & $(u_0,1,R)$ &  &  &  & $(k_1,1,L)$\\
-$u_1$ & $(u_1,0,R)$ & $(u_1,1,R)$ &  &  &  & $(k_1,0,L)$\\
-$k_1$ & $(k_1,0,L)$ & $(k_1,1,L)$ & $(k_2,c,L)$ &  &  & \\
-$k_2$ & $(k_2,0,L)$ & $(k_2,1,L)$ &  & $(q_0,x,R)$ & $(q_0,y,R)$ & \\
-$*h$ &  &  &  &  &  & \\\bottomrule\end{tabular}\end{center}
-\par\noindent\textbf{Transition rules ($a,b\in\{0,1\}$, slides' notation):}
+\textbf{Formal notation.} State storage $[q,a]$ ($a$ = the bit being carried) and two tracks $[t,X]$ ($t\in\{B,\ast\}$ is the check mark, $X\in\{0,1,c,B\}$). $M=(Q,\Sigma,\Gamma,\delta,[q_0,B],[B,B],\{[q_5,B]\})$ with input symbols $[B,0],[B,1],[B,c]$. The start state is $[q_0,B]$; the final state $[q_5,B]$ has no moves, so $M$ halts there with the NOT of $w$ after $c$ (it computes by halting). Here $a,b\in\{0,1\}$ and $\bar a=1-a$.
+\par\noindent\textbf{Transition rules:}
 {\small\begin{enumerate}[label=\arabic*.,itemsep=0pt]
-\item $\delta(q_0,[B,a])=([r,a],[\ast,a],R)$ for $a\in\{0,1\}$ --- check the next bit and store it.
-\item $\delta([r,a],[B,b])=([r,a],[B,b],R)$; \ $\delta([r,a],[B,c])=([u,a],[B,c],R)$ --- go past $c$.
-\item $\delta([u,a],[B,b])=([u,a],[B,b],R)$ --- skip the bits already written.
-\item $\delta([u,a],[B,B])=(k_1,[B,\bar a],L)$ --- write the complement $\bar a=1-a$.
-\item $\delta(k_1,[B,b])=(k_1,[B,b],L)$; \ $\delta(k_1,[B,c])=(k_2,[B,c],L)$ --- back to $c$.
-\item $\delta(k_2,[B,b])=(k_2,[B,b],L)$; \ $\delta(k_2,[\ast,b])=(q_0,[\ast,b],R)$ --- to the last checked bit; next round.
-\item $\delta(q_0,[B,c])=(h,[B,c],R)$ --- every bit done: halt.
+\item $\delta([q_0,B],[B,a])=([q_1,a],[\ast,a],R)$
+\item $\delta([q_1,a],[B,b])=([q_1,a],[B,b],R)$
+\item $\delta([q_1,a],[B,c])=([q_2,a],[B,c],R)$
+\item $\delta([q_2,a],[\ast,0/1])=([q_2,a],[\ast,0/1],R)$
+\item $\delta([q_2,a],[B,B])=([q_3,B],[\ast,\bar a],L)$
+\item $\delta([q_3,B],[\ast,0/1])=([q_3,B],[\ast,0/1],L)$
+\item $\delta([q_3,B],[B,c])=([q_4,B],[B,c],L)$
+\item $\delta([q_4,B],[B,0/1])=([q_4,B],[B,0/1],L)$
+\item $\delta([q_4,B],[\ast,0/1])=([q_0,B],[\ast,0/1],R)$
+\item $\delta([q_0,B],[B,c])=([q_5,B],[B,c],R)$
 \end{enumerate}}
-$r_b=[r,b]$ and $u_b=[u,b]$ remember that the bit read was $b$ (so $\lnot b$ is written). When $q_0$ meets $c$, all of $w$ is processed: $M$ enters $h$, which has no moves, and halts. Example $w=10$: final tape \texttt{yxc01}.
 \end{solution}
 
 %-------------------------------------------------------------------
@@ -4434,117 +4410,53 @@ $r_b=[r,b]$ and $u_b=[u,b]$ remember that the bit read was $b$ (so $\lnot b$ is 
 Construct a TM converting signed-magnitude binary $w$ to two's complement. The leftmost bit is the MSB. If the MSB is 0, leave the number unchanged. If it is 1, scan from the LSB: copy zeros up to the first 1, copy that 1, and flip all remaining bits, leaving the MSB as 1. Finish with only the two's-complement number on the tape.
 \end{question}
 \begin{solution}
-Mark the sign bit with $S$ (so the right-to-left scan knows where to stop), go to the right end, then implement ``copy up to and including the first 1, then flip''.
-\fig{\begin{tikzpicture}[tmd,node distance=27mm]
- \node[state,initial] (q0) {$q_0$}; \node[state] (g) [right=of q0] {$g$}; \node[state] (c) [right=of g] {$c$}; \node[state] (f) [right=of c] {$f$};
- \node[state,accepting] (h) [below=15mm of c] {$h$};
- \path (q0) edge node {\tm1SR} (g) (q0) edge[bend right=20] node[swap] {\tm00R\ (MSB 0)} (h)
-  (g) edge[loop above] node {\tm00R, \tm11R} () (g) edge node {\tm\blank\blank L} (c)
-  (c) edge[loop above] node {\tm00L} () (c) edge node {\tm11L} (f) (c) edge node[swap,pos=.4] {\tm S1L} (h)
-  (f) edge[loop above] node[align=center] {\tm01L\\ \tm10L} () (f) edge[bend left=20] node {\tm S1L} (h);
-\end{tikzpicture}}
-\begin{center}\small\begin{tabular}{l|cccc}\toprule
-State & $0$ & $1$ & $S$ & $B$\\\midrule
-$\to q_0$ & $(h,0,R)$ & $(g,S,R)$ &  & \\
-$g$ & $(g,0,R)$ & $(g,1,R)$ &  & $(c,B,L)$\\
-$c$ & $(c,0,L)$ & $(f,1,L)$ & $(h,1,L)$ & \\
-$f$ & $(f,1,L)$ & $(f,0,L)$ & $(h,1,L)$ & \\
-$*h$ &  &  &  & \\\bottomrule\end{tabular}\end{center}
-\par\noindent\textbf{Transition rules (numbered as in the slides):}
-{\small\begin{enumerate}[label=\arabic*.,itemsep=0pt]
-\item $\delta(q_0,0)=(h,0,R)$ --- MSB 0: the number is non-negative; halt.
-\item $\delta(q_0,1)=(g,S,R)$ --- MSB 1: mark it $S$.
-\item $\delta(g,a)=(g,a,R)$ for $a\in\{0,1\}$; \ $\delta(g,B)=(c,B,L)$ --- go to the LSB.
-\item $\delta(c,0)=(c,0,L)$ --- keep the trailing 0's.
-\item $\delta(c,1)=(f,1,L)$ --- keep the first 1, start flipping.
-\item $\delta(f,0)=(f,1,L)$, \ $\delta(f,1)=(f,0,L)$ --- flip the remaining bits.
-\item $\delta(c,S)=(h,1,L)$, \ $\delta(f,S)=(h,1,L)$ --- restore the sign bit 1 and halt.
-\end{enumerate}}
-\begin{itemize}
-\item $q_0$: MSB 0 $\Rightarrow$ the number is non-negative: go to $h$ (no moves), leaving the tape unchanged. MSB 1 $\Rightarrow$ replace it by $S$.
-\item $g$: run to the right end; $c$: leave the trailing 0's, leave the first 1 and switch to $f$; $f$: flip every bit until $S$; finally restore $S\to1$ and halt in $h$.
-\end{itemize}
-Example $1101$ ($-5$): $S101\to$ LSB 1 kept, then $0\to1$, $1\to0$: $1011$, which is $-5$ in 4-bit two's complement \ok.
+\textbf{Formal notation.} $M=(\{q_0,q_1,q_2,q_3,q_4,q_5\},\{0,1\},\{0,1,B\},\delta,q_0,B,\{q_5\})$. The start state is $q_0$; the final state $q_5$ has no moves, so $M$ halts there with the two's-complement number on the tape (it computes by halting). An entry ``---'' means no move.
+\begin{center}\small\begin{tabular}{l|ccc}\toprule
+State & $0$ & $1$ & $B$\\\midrule
+$\to q_0$ & $(q_5,0,R)$ & $(q_1,1,R)$ & ---\\
+$q_1$ & $(q_1,0,R)$ & $(q_1,1,R)$ & $(q_2,B,L)$\\
+$q_2$ & $(q_2,0,L)$ & $(q_3,1,L)$ & ---\\
+$q_3$ & $(q_3,1,L)$ & $(q_3,0,L)$ & $(q_4,B,R)$\\
+$q_4$ & $(q_5,1,R)$ & --- & ---\\
+$*q_5$ & --- & --- & ---\\\bottomrule\end{tabular}\end{center}
 \end{solution}
 
 %-------------------------------------------------------------------
+\repeated{3}
 \begin{question}{2019--2020 \textbullet\ Q9}{Source M42}{15}
 Design a TM computing AND of equal-length binary $w_1$ and $w_2$. Initially the tape is $w_1cw_2c$. Finish with their AND in binary after the second $c$. Multiple tracks and state storage are allowed.
 \end{question}
-\begin{solution}
-The machine below is written for a bitwise operation $\odot$; here $\odot=$ AND (the next two blocks reuse it with XOR and OR).
-
-\textbf{Algorithm.} Repeat: (1) take the leftmost unchecked bit $b$ of $w_1$, store it in the state ($r_b=[r,b]$) and check it ($x=[\ast,0]$, $y=[\ast,1]$); (2) go right past the first $c$ to the leftmost unchecked bit $b'$ of $w_2$, check it and store $o=b\odot b'$ in the state ($t_o$); (3) go right past the second $c$ and past the result bits written so far to the first blank, write $o$; (4) return left to the last checked bit of $w_1$. When step (1) finds $c$ instead of a bit, enter the halting state $h$.
-
-$M=(Q,\{0,1,c\},\{0,1,c,x,y,B\},\delta,q_0,B,\{h\})$, $Q=\{q_0,r_0,r_1,s_0,s_1,t_0,t_1,u_0,u_1,k_1,k_2,k_3,h\}$:
-\begin{center}\small\begin{tabular}{l|cccccc}\toprule
-State & $0$ & $1$ & $x$ & $y$ & $c$ & $B$\\\midrule
-$\to q_0$ & $(r_0,x,R)$ & $(r_1,y,R)$ &  &  & $(h,c,R)$ & \\
-$r_0$ & $(r_0,0,R)$ & $(r_0,1,R)$ &  &  & $(s_0,c,R)$ & \\
-$r_1$ & $(r_1,0,R)$ & $(r_1,1,R)$ &  &  & $(s_1,c,R)$ & \\
-$s_0$ & $(t_0,x,R)$ & $(t_0,y,R)$ & $(s_0,x,R)$ & $(s_0,y,R)$ &  & \\
-$s_1$ & $(t_0,x,R)$ & $(t_1,y,R)$ & $(s_1,x,R)$ & $(s_1,y,R)$ &  & \\
-$t_0$ & $(t_0,0,R)$ & $(t_0,1,R)$ &  &  & $(u_0,c,R)$ & \\
-$t_1$ & $(t_1,0,R)$ & $(t_1,1,R)$ &  &  & $(u_1,c,R)$ & \\
-$u_0$ & $(u_0,0,R)$ & $(u_0,1,R)$ &  &  &  & $(k_1,0,L)$\\
-$u_1$ & $(u_1,0,R)$ & $(u_1,1,R)$ &  &  &  & $(k_1,1,L)$\\
-$k_1$ & $(k_1,0,L)$ & $(k_1,1,L)$ &  &  & $(k_2,c,L)$ & \\
-$k_2$ & $(k_2,0,L)$ & $(k_2,1,L)$ & $(k_2,x,L)$ & $(k_2,y,L)$ & $(k_3,c,L)$ & \\
-$k_3$ & $(k_3,0,L)$ & $(k_3,1,L)$ & $(q_0,x,R)$ & $(q_0,y,R)$ &  & \\
-$*h$ &  &  &  &  &  & \\\bottomrule\end{tabular}\end{center}
-$h$ has no moves. The rows $s_0,s_1$ are those for $\odot=$ AND; in general $\delta(s_b,b')=(t_{b\odot b'},\cdot,R)$, with $b\odot b'$ from the operation table:
-\begin{center}\small\begin{tabular}{cc|ccc}\toprule $b$&$b'$& AND & XOR & OR\\\midrule 0&0&0&0&0\\0&1&0&1&1\\1&0&0&1&1\\1&1&1&0&1\\\bottomrule\end{tabular}\end{center}
-In the slides' notation ($r_b=[r,b]$, $s_b=[s,b]$, $t_o=[t,o]$, $u_o=[u,o]$; unchecked bit $[B,a]$, checked bit $[\ast,a]$, $c=[B,c]$, blank $[B,B]$; $a,b,o\in\{0,1\}$):
-\par\noindent\textbf{Transition rules (numbered as in the slides):}
-{\small\begin{enumerate}[label=\arabic*.,itemsep=0pt]
-\item $\delta(q_0,[B,a])=([r,a],[\ast,a],R)$ --- check the next bit $a$ of $w_1$ and store it.
-\item $\delta([r,a],[B,b])=([r,a],[B,b],R)$; \ $\delta([r,a],[B,c])=([s,a],[B,c],R)$ --- go to $w_2$.
-\item $\delta([s,a],[\ast,b])=([s,a],[\ast,b],R)$ --- skip the checked bits of $w_2$.
-\item $\delta([s,a],[B,b])=([t,a\odot b],[\ast,b],R)$ --- check bit $b$ of $w_2$ and store $o=a\odot b$ (here $a\wedge b$).
-\item $\delta([t,o],[B,b])=([t,o],[B,b],R)$; \ $\delta([t,o],[B,c])=([u,o],[B,c],R)$ --- go past the second $c$.
-\item $\delta([u,o],[B,b])=([u,o],[B,b],R)$; \ $\delta([u,o],[B,B])=(k_1,[B,o],L)$ --- write $o$ after the result bits so far.
-\item $\delta(k_1,[B,b])=(k_1,[B,b],L)$; \ $\delta(k_1,[B,c])=(k_2,[B,c],L)$ --- back to the second $c$.
-\item $\delta(k_2,[t,b])=(k_2,[t,b],L)$ for $t\in\{B,\ast\}$; \ $\delta(k_2,[B,c])=(k_3,[B,c],L)$ --- across $w_2$ to the first $c$.
-\item $\delta(k_3,[B,b])=(k_3,[B,b],L)$; \ $\delta(k_3,[\ast,b])=(q_0,[\ast,b],R)$ --- to the last checked bit of $w_1$; next round.
-\item $\delta(q_0,[B,c])=(h,[B,c],R)$ --- $w_1$ used up: halt.
-\end{enumerate}}
-
-
-\textbf{Example} (AND): \texttt{10c11c} $\to$ round 1 writes $1\wedge1=1$, round 2 writes $0\wedge1=0$; then $q_0$ reads $c$ and halts: final tape \texttt{yxcyyc10}, i.e.\ the AND \texttt{10} after the second $c$. (A final sweep can restore $x\to0$, $y\to1$.) The machine performs $n$ rounds of $O(n)$ moves: $O(n^2)$ time.
-\end{solution}
-
-%-------------------------------------------------------------------
 \begin{question}{January 2020 Term \textbullet\ Q9}{Source M38}{15}
 Design a TM computing XOR of equal-length binary $w_1$ and $w_2$. Initially the tape contains $w_1cw_2c$. Finish with the XOR in binary after the second $c$.
 \end{question}
-\begin{solution}
-Same machine as 2019--2020 Q9 above, with $\odot=$ XOR. Only the two $s_b$ rows change (XOR column of the operation table):
-\begin{center}\small\begin{tabular}{l|cccc}\toprule
-State & 0 & 1 & $x$ & $y$\\\midrule
-$s_0$ & $(t_0,x,R)$ & $(t_1,y,R)$ & $(s_0,x,R)$ & $(s_0,y,R)$\\
-$s_1$ & $(t_1,x,R)$ & $(t_0,y,R)$ & $(s_1,x,R)$ & $(s_1,y,R)$\\\bottomrule
-\end{tabular}\end{center}
-In the rule list of 2019--2020 Q9 only rule 4 changes: $\delta([s,a],[B,b])=([t,a\oplus b],[\ast,b],R)$.
-
-\textbf{Example:} \texttt{10c11c} $\to$ round 1 writes $1\oplus1=0$, round 2 writes $0\oplus1=1$: final tape \texttt{yxcyyc01}, i.e.\ the XOR \texttt{01} after the second $c$. Time $O(n^2)$.
-\end{solution}
-
-%-------------------------------------------------------------------
 \begin{question}{2017--2018 \textbullet\ Q9}{Source M34}{15}
 Design a TM computing bitwise OR of equal-length binary $M_1$ and $M_2$. Initially the tape is $M_1\#M_2\#$. Finish with the binary OR after the second $\#$.
 \end{question}
 \begin{solution}
-Same machine as 2019--2020 Q9 above, with $\odot=$ OR and the separator $\#$ in place of $c$ (every $c$ in the table becomes $\#$). The two $s_b$ rows (OR column of the operation table):
-\begin{center}\small\begin{tabular}{l|cccc}\toprule
-State & 0 & 1 & $x$ & $y$\\\midrule
-$s_0$ & $(t_0,x,R)$ & $(t_1,y,R)$ & $(s_0,x,R)$ & $(s_0,y,R)$\\
-$s_1$ & $(t_1,x,R)$ & $(t_1,y,R)$ & $(s_1,x,R)$ & $(s_1,y,R)$\\\bottomrule
-\end{tabular}\end{center}
-In the rule list of 2019--2020 Q9 rule 4 becomes $\delta([s,a],[B,b])=([t,a\vee b],[\ast,b],R)$, and $[B,\#]$ replaces $[B,c]$ everywhere.
+\textbf{Formal notation.} State storage $[q,a,b]$ ($a$ = the bit of $w_1$, $b$ = the bit of $w_2$ being carried) and two tracks $[t,X]$ ($t\in\{B,\ast\}$ is the check mark, $X\in\{0,1,c,B\}$). $M=(Q,\Sigma,\Gamma,\delta,[q_0,B,B],[B,B],\{[q_8,B,B]\})$ with input symbols $[B,0],[B,1],[B,c]$. The start state is $[q_0,B,B]$; the final state $[q_8,B,B]$ has no moves, so $M$ halts there with the result after the second $c$ (it computes by halting). Here $a,b\in\{0,1\}$.
 
-\textbf{Example:} \texttt{10\#01\#} $\to$ round 1 writes $1\vee0=1$, round 2 writes $0\vee1=1$; $q_0$ then reads $\#$ and halts: final tape \texttt{yx\#xy\#11}, i.e.\ the OR \texttt{11} after the second $\#$. Time $O(n^2)$.
+\textbf{Rule of $d$} (the bit written in rule 9): $d=a\wedge b$ for AND (2019--2020 Q9), $d=a\oplus b$ for XOR (January 2020 Term Q9), $d=a\vee b$ for OR (2017--2018 Q9; there the separator is $\#$, so read $[B,\#]$ for $[B,c]$ in every rule).
+\begin{center}\small\begin{tabular}{cc|ccc}\toprule $a$&$b$& AND & XOR & OR\\\midrule 0&0&0&0&0\\0&1&0&1&1\\1&0&0&1&1\\1&1&1&0&1\\\bottomrule\end{tabular}\end{center}
+\par\noindent\textbf{Transition rules:}
+{\small\begin{enumerate}[label=\arabic*.,itemsep=0pt]
+\item $\delta([q_0,B,B],[B,a])=([q_1,a,B],[\ast,a],R)$
+\item $\delta([q_1,a,B],[B,b])=([q_1,a,B],[B,b],R)$
+\item $\delta([q_1,a,B],[B,c])=([q_2,a,B],[B,c],R)$
+\item $\delta([q_2,a,B],[\ast,0/1])=([q_2,a,B],[\ast,0/1],R)$
+\item $\delta([q_2,a,B],[B,b])=([q_3,a,b],[\ast,b],R)$
+\item $\delta([q_3,a,b],[B,0/1])=([q_3,a,b],[B,0/1],R)$
+\item $\delta([q_3,a,b],[B,c])=([q_4,a,b],[B,c],R)$
+\item $\delta([q_4,a,b],[B,0/1])=([q_4,a,b],[B,0/1],R)$
+\item $\delta([q_4,a,b],[B,B])=([q_5,B,B],[B,d],L)$ \quad (where $d$ is given by the rule above)
+\item $\delta([q_5,B,B],[B,0/1])=([q_5,B,B],[B,0/1],L)$
+\item $\delta([q_5,B,B],[B,c])=([q_6,B,B],[B,c],L)$
+\item $\delta([q_6,B,B],[\ast/B,0/1])=([q_6,B,B],[\ast/B,0/1],L)$
+\item $\delta([q_6,B,B],[B,c])=([q_7,B,B],[B,c],L)$
+\item $\delta([q_7,B,B],[B,0/1])=([q_7,B,B],[B,0/1],L)$
+\item $\delta([q_7,B,B],[\ast,0/1])=([q_0,B,B],[\ast,0/1],R)$
+\item $\delta([q_0,B,B],[B,c])=([q_8,B,B],[B,c],R)$
+\end{enumerate}}
 \end{solution}
-
 %-------------------------------------------------------------------
 \begin{question}{2016--2017 \textbullet\ Q5(b)}{Source M30}{20}
 Design a TM adding 1 to binary $N$. Initially the leftmost tape portion is $\#N$ (e.g.\ \#101), with the head on $\#$. Halt after replacing $N$ by $N+1$; you may replace $\#$ by 0 or 1 if necessary. Briefly explain the working principle.
@@ -4607,32 +4519,23 @@ Formally $M=(\{q_0,q_1,q_2,q_3,q_{acc}\},\{0,1\},\{0,1,X,B\},\delta,q_0,B,\{q_{a
 Design a TM for $\{a^nb^nc^n\mid n\ge1\}$. Briefly describe its working principle.
 \end{question}
 \begin{solution}
-\textbf{Principle.} Each round replaces the leftmost $a$ by $X$, the leftmost $b$ by $Y$ and the leftmost $c$ by $Z$, then returns to the rightmost $X$. When no $a$ is left, all $b$'s and $c$'s must also be crossed. No separate format check is needed: the table has no move for any symbol out of order (e.g.\ $q_1$ on $c$, $q_2$ on $a$, $q_4$ on $a,b,c$), so such inputs halt without acceptance.
-\begin{center}\small\begin{tabular}{l|ccccccc}\toprule State & $a$ & $b$ & $c$ & $X$ & $Y$ & $Z$ & $B$\\\midrule
-$\to q_0$ & $(q_1,X,R)$ & & & & $(q_4,Y,R)$ & & \\
-$q_1$ & $(q_1,a,R)$ & $(q_2,Y,R)$ & & & $(q_1,Y,R)$ & & \\
-$q_2$ & & $(q_2,b,R)$ & $(q_3,Z,L)$ & & & $(q_2,Z,R)$ & \\
-$q_3$ & $(q_3,a,L)$ & $(q_3,b,L)$ & & $(q_0,X,R)$ & $(q_3,Y,L)$ & $(q_3,Z,L)$ & \\
-$q_4$ & & & & & $(q_4,Y,R)$ & $(q_4,Z,R)$ & $(q_{acc},B,R)$\\
-$*q_{acc}$ & & & & & & & \\\bottomrule\end{tabular}\end{center}
-\par\noindent\textbf{Transition rules (numbered as in the slides):}
+\textbf{Formal notation.} Two tracks $[t,X]$ ($t\in\{B,\ast\}$ is the check mark, $X\in\{a,b,c,B\}$). $M=(\{q_0,q_1,q_2,q_3,q_4,q_7\},\Sigma,\Gamma,\delta,q_0,[B,B],\{q_7\})$ with input symbols $[B,a],[B,b],[B,c]$. The start state is $q_0$; $M$ accepts by entering the final state $q_7$ ($F=\{q_7\}$). If no rule applies in any other state, $M$ halts without accepting, i.e.\ it rejects.
+\par\noindent\textbf{Transition rules:}
 {\small\begin{enumerate}[label=\arabic*.,itemsep=0pt]
-\item $\delta(q_0,a)=(q_1,X,R)$ --- mark the leftmost $a$.
-\item $\delta(q_1,s)=(q_1,s,R)$ for $s\in\{a,Y\}$; \ $\delta(q_1,b)=(q_2,Y,R)$ --- find and mark the first $b$.
-\item $\delta(q_2,s)=(q_2,s,R)$ for $s\in\{b,Z\}$; \ $\delta(q_2,c)=(q_3,Z,L)$ --- find and mark the first $c$.
-\item $\delta(q_3,s)=(q_3,s,L)$ for $s\in\{a,b,Y,Z\}$; \ $\delta(q_3,X)=(q_0,X,R)$ --- back to the rightmost $X$.
-\item $\delta(q_0,Y)=(q_4,Y,R)$ --- no $a$ left.
-\item $\delta(q_4,s)=(q_4,s,R)$ for $s\in\{Y,Z\}$; \ $\delta(q_4,B)=(q_{acc},B,R)$ --- only $Y$'s and $Z$'s remain: accept.
+\item $\delta(q_0,[B,a])=(q_1,[\ast,a],R)$
+\item $\delta(q_1,[B,a])=(q_1,[B,a],R)$
+\item $\delta(q_1,[B,b])=(q_2,[\ast,b],R)$
+\item $\delta(q_1,[\ast,b])=(q_1,[\ast,b],R)$
+\item $\delta(q_2,[B,b])=(q_2,[B,b],R)$
+\item $\delta(q_2,[\ast,c])=(q_2,[\ast,c],R)$
+\item $\delta(q_2,[B,c])=(q_3,[\ast,c],L)$
+\item $\delta(q_3,[\ast/B,b/c])=(q_3,[\ast/B,b/c],L)$
+\item $\delta(q_3,[B,a])=(q_3,[B,a],L)$
+\item $\delta(q_3,[\ast,a])=(q_0,[\ast,a],R)$
+\item $\delta(q_0,[\ast,b])=(q_4,[\ast,b],R)$
+\item $\delta(q_4,[\ast,b/c])=(q_4,[\ast,b/c],R)$
+\item $\delta(q_4,[B,B])=(q_7,[B,B],R)$ \quad $(F=\{q_7\})$
 \end{enumerate}}
-$M=(\{q_0,\dots,q_4,q_{acc}\},\{a,b,c\},\{a,b,c,X,Y,Z,B\},\delta,q_0,B,\{q_{acc}\})$.
-\fig{\begin{tikzpicture}[tmd,node distance=27mm]
- \node[state,initial] (0) {$q_0$}; \node[state] (1) [right=of 0] {$q_1$}; \node[state] (2) [right=of 1] {$q_2$}; \node[state] (3) [below=18mm of 1] {$q_3$};
- \node[state] (4) [below=18mm of 0] {$q_4$}; \node[state,accepting] (5) [left=24mm of 4] {$q_{acc}$};
- \path (0) edge node {\tm aXR} (1) (1) edge[loop above] node {\tm aaR, \tm YYR} () (1) edge node {\tm bYR} (2) (2) edge[loop above] node {\tm bbR, \tm ZZR} ()
-  (2) edge node {\tm cZL} (3) (3) edge[loop below] node[align=center] {\tm aaL, \tm bbL\\ \tm YYL, \tm ZZL} () (3) edge node {\tm XXR} (0)
-  (0) edge node[swap] {\tm YYR} (4) (4) edge[loop below] node {\tm YYR, \tm ZZR} () (4) edge node[swap] {\tm\blank\blank R} (5);
-\end{tikzpicture}}
-Example $aabbcc$: $XaYbZc\to XXYYZZ$, then $q_0$ sees $Y$, $q_4$ skips $YYZZ$ and accepts: $\ldots\vdash XXYYZZ\,q_4B\vdash XXYYZZB\,q_{acc}B$.
 \end{solution}
 
 %-------------------------------------------------------------------
@@ -4640,42 +4543,18 @@ Example $aabbcc$: $XaYbZc\to XXYYZZ$, then $q_0$ sees $Y$, $q_4$ skips $YYZZ$ an
 Design a TM computing the printed truncated-subtraction function $a\ominus b=\max(b-a,0)$. Initially $a$ and $b$ are unary blocks of consecutive 1's separated by 0. Finish with only the unary result surrounded by blanks. Briefly describe how it works.
 \end{question}
 \begin{solution}
-Input $1^a01^b$. \textbf{Principle:} repeatedly erase one 1 from the left end of the $a$-block and one 1 from the right end of the $b$-block. If the $a$-block runs out first ($q_0$ reads the 0 at the left), erase the 0: what remains is $1^{b-a}$. If the $b$-block runs out first ($q_2$ reads the 0 at the right end), $b<a$: erase the 0 and every 1 still to its left, leaving a blank tape (result 0).
-\fig{\begin{tikzpicture}[tmd,node distance=27mm]
- \node[state,initial] (0) {$q_0$}; \node[state] (1) [right=of 0] {$q_1$}; \node[state] (2) [right=of 1] {$q_2$}; \node[state] (3) [below=18mm of 1] {$q_3$};
- \node[state] (5) [right=of 2] {$q_5$}; \node[state,accepting] (h) [below=18mm of 0] {$h$};
- \path (0) edge node {\tm1\blank R} (1) (1) edge[loop above] node {\tm11R, \tm00R} () (1) edge node {\tm\blank\blank L} (2)
-  (2) edge node {\tm1\blank L} (3) (3) edge[loop below] node {\tm11L, \tm00L} () (3) edge node[pos=.4] {\tm\blank\blank R} (0)
-  (0) edge node[swap] {\tm0\blank R} (h) (2) edge node {\tm0\blank L} (5) (5) edge[loop above] node {\tm1\blank L} () (5) edge[bend left=30] node {\tm\blank\blank R} (h);
-\end{tikzpicture}}
+\textbf{Formal notation.} $M=(\{q_0,\dots,q_7\},\{0,1\},\{0,1,B\},\delta,q_0,B,\{q_6\})$, input $1^a01^b$. The start state is $q_0$; the final state $q_6$ has no moves, so $M$ halts there with the result on the tape (it computes by halting). An entry ``---'' means no move.
 \begin{center}\small\begin{tabular}{l|ccc}\toprule
-State & $1$ & $0$ & $B$\\\midrule
-$\to q_0$ & $(q_1,B,R)$ & $(h,B,R)$ & \\
-$q_1$ & $(q_1,1,R)$ & $(q_1,0,R)$ & $(q_2,B,L)$\\
-$q_2$ & $(q_3,B,L)$ & $(q_5,B,L)$ & \\
-$q_3$ & $(q_3,1,L)$ & $(q_3,0,L)$ & $(q_0,B,R)$\\
-$q_5$ & $(q_5,B,L)$ &  & $(h,B,R)$\\
-$*h$ &  &  & \\\bottomrule\end{tabular}\end{center}
-\par\noindent\textbf{Transition rules (numbered as in the slides):}
-{\small\begin{enumerate}[label=\arabic*.,itemsep=0pt]
-\item $\delta(q_0,1)=(q_1,B,R)$ --- erase the leftmost 1 of the $a$-block.
-\item $\delta(q_1,s)=(q_1,s,R)$ for $s\in\{0,1\}$; \ $\delta(q_1,B)=(q_2,B,L)$ --- go to the right end.
-\item $\delta(q_2,1)=(q_3,B,L)$ --- erase the rightmost 1 of the $b$-block.
-\item $\delta(q_3,s)=(q_3,s,L)$ for $s\in\{0,1\}$; \ $\delta(q_3,B)=(q_0,B,R)$ --- back to the left end.
-\item $\delta(q_0,0)=(h,B,R)$ --- $a$-block used up: erase the 0, $1^{b-a}$ remains; halt.
-\item $\delta(q_2,0)=(q_5,B,L)$ --- $b$-block used up: erase the 0,
-\item $\delta(q_5,1)=(q_5,B,L)$; \ $\delta(q_5,B)=(h,B,R)$ --- erase the remaining 1's; halt with a blank tape.
-\end{enumerate}}
-$h$ has no moves: $M$ halts there with the result on the tape.
-
-\textbf{Example} $a=1,b=3$: $1\,0\,111\to\ 0\,11\to$ $q_0$ reads 0, erases it $\to$ $11$ \ok\ ($3-1=2$).
-
-\textbf{Example} $a=2,b=1$: round 1 erases the first 1 and the last 1, leaving $1\,0$ (the $b$-block is now empty). Round 2: $q_0$ erases the last 1 of the $a$-block, $q_1$ runs right, and $q_2$ now reads the 0, i.e.\ the $b$-block is exhausted; $q_5$ erases the 0, finds only blanks to its left and halts: blank tape \ok\ (result $\max(1-2,0)=0$). In IDs:
-\[\begin{array}{l}
-q_01101\vdash q_1101\vdash 1q_101\vdash 10q_11\vdash 101q_1B\vdash 10q_21\vdash 1q_30\vdash q_310\vdash q_3B10\\
-\vdash q_010\vdash q_10\vdash 0q_1B\vdash q_20\vdash q_5B\vdash hB.
-\end{array}\]
-(With $a=3$, $b=1$ one 1 of the $a$-block is still left when $q_2$ reads the 0; the loop of $q_5$ erases it.)
+State & $0$ & $1$ & $B$\\\midrule
+$\to q_0$ & $(q_5,B,R)$ & $(q_1,B,R)$ & ---\\
+$q_1$ & $(q_2,0,R)$ & $(q_1,1,R)$ & ---\\
+$q_2$ & $(q_2,0,R)$ & $(q_3,0,L)$ & $(q_7,B,L)$\\
+$q_3$ & $(q_3,0,L)$ & $(q_4,1,L)$ & $(q_0,B,R)$\\
+$q_4$ & --- & $(q_4,1,L)$ & $(q_0,B,R)$\\
+$q_5$ & $(q_5,B,R)$ & $(q_5,1,R)$ & $(q_6,B,R)$\\
+$*q_6$ & --- & --- & ---\\
+$q_7$ & $(q_7,B,L)$ & $(q_7,B,L)$ & $(q_6,B,R)$\\\bottomrule\end{tabular}\end{center}
+\textbf{How it works.} Each round cancels one 1 of $a$ against one 1 of $b$: $q_0$ erases the leftmost 1 of the $a$-block, $q_1$ runs to the separator 0, $q_2$ skips the 0's and turns the first remaining 1 of the $b$-block into 0, and $q_3$/$q_4$ walk back to the blank on the left. If the $a$-block is used up ($q_0$ reads 0), $q_5$ erases the 0's and keeps the 1's: $1^{b-a}$ remains. If the $b$-block is used up ($q_2$ reaches the blank), $b\le a$ and $q_7$ erases everything to its left: the result is 0 (blank tape).
 \end{solution}
 
 %-------------------------------------------------------------------
@@ -4683,41 +4562,69 @@ q_01101\vdash q_1101\vdash 1q_101\vdash 10q_11\vdash 101q_1B\vdash 10q_21\vdash 
 Draw a state diagram of a TM deciding $L=\{w\text{-}w\mid w\in\{a,b\}^*\}$.
 \end{question}
 \begin{solution}
-Zig-zag: cross off the first unchecked symbol on the left of ``$-$'', remember it, cross off the matching first unchecked symbol on the right; when the left side is exhausted, check the right side is too.
-\fig{\begin{tikzpicture}[tmd,node distance=24mm]
- \node[state,initial above] (1) at (0,0) {$q_1$};
- \node[state] (a) at (2.8,1.6) {$q_a$}; \node[state] (a2) at (6.0,1.6) {$q_a'$};
- \node[state] (b) at (2.8,-1.6) {$q_b$}; \node[state] (b2) at (6.0,-1.6) {$q_b'$};
- \node[state] (6) at (9.2,0) {$q_6$}; \node[state] (7) at (1.8,-4.2) {$q_7$};
- \node[state] (8) at (-2.8,0) {$q_8$}; \node[state,accepting] (acc) at (-2.8,-2.4) {$q_{acc}$};
- \path (1) edge node {\tm axR} (a) (1) edge node[pos=.45] {\tm bxR} (b) (1) edge node[swap] {\tm{-}{-}R} (8)
-  (a) edge[loop above] node {\tm aaR, \tm bbR} () (a) edge node {\tm{-}{-}R} (a2) (a2) edge[loop above] node {\tm xxR} () (a2) edge node {\tm axL} (6)
-  (b) edge[loop below] node {\tm aaR, \tm bbR} () (b) edge node[swap] {\tm{-}{-}R} (b2) (b2) edge[loop above] node {\tm xxR} () (b2) edge node[pos=.6] {\tm bxL} (6)
-  (6) edge[loop right] node[align=left] {\tm aaL, \tm bbL\ \tm xxL} () (6) edge[bend left=20] node {\tm{-}{-}L} (7) (7) edge[loop below] node {\tm aaL, \tm bbL} () (7) edge node {\tm xxR} (1)
-  (8) edge[loop above] node {\tm xxR} () (8) edge node[swap] {\tm\blank\blank R} (acc);
+Same procedure as the equality comparison of 2023--2024 Q9: check off the leftmost unchecked symbol of the left $w$ and store it in the state, find the leftmost unchecked symbol right of ``$-$'', check it off if it is the same, and come back. When the left $w$ is used up, every symbol on the right must already be checked.
+
+\textbf{Formal notation.} State storage $[q,x]$ ($x$ = the symbol being carried) and two tracks $[t,X]$ ($t\in\{B,\ast\}$ is the check mark, $X\in\{a,b,-,B\}$). $M=(Q,\Sigma,\Gamma,\delta,[q_0,B],[B,B],\{[q_6,B]\})$ with input symbols $[B,a],[B,b],[B,-]$. The start state is $[q_0,B]$; $M$ accepts by entering the final state $[q_6,B]$. Where no rule applies (e.g.\ a mismatch, a missing or second ``$-$'', unequal lengths) $M$ halts without accepting. Here $x,y\in\{a,b\}$.
+\fig{\begin{tikzpicture}[tmd,font=\scriptsize,every state/.append style={minimum size=12mm,inner sep=0pt}]
+ \node[state,initial] (0) at (0,0) {$[q_0,B]$};
+ \node[state] (1a) at (3.6,2.6) {$[q_1,a]$}; \node[state] (2a) at (8.2,2.6) {$[q_2,a]$};
+ \node[state] (1b) at (3.6,-2.6) {$[q_1,b]$}; \node[state] (2b) at (8.2,-2.6) {$[q_2,b]$};
+ \node[state] (3) at (11.4,0) {$[q_3,B]$}; \node[state] (4) at (5.9,0) {$[q_4,B]$};
+ \node[state] (5) at (0,-5.8) {$[q_5,B]$}; \node[state,accepting] (6) at (4.6,-5.8) {$[q_6,B]$};
+ \path (0) edge node[pos=.55] {\tm{[B,a]}{[\ast,a]}R} (1a)
+  (0) edge node[swap,pos=.55] {\tm{[B,b]}{[\ast,b]}R} (1b)
+  (1a) edge[loop above] node[align=center] {\tm{[B,a]}{[B,a]}R\\ \tm{[B,b]}{[B,b]}R} ()
+  (1b) edge[loop below] node[align=center] {\tm{[B,a]}{[B,a]}R\\ \tm{[B,b]}{[B,b]}R} ()
+  (1a) edge node {\tm{[B,-]}{[B,-]}R} (2a) (1b) edge node[swap] {\tm{[B,-]}{[B,-]}R} (2b)
+  (2a) edge[loop above] node[align=center] {\tm{[\ast,a]}{[\ast,a]}R\\ \tm{[\ast,b]}{[\ast,b]}R} ()
+  (2b) edge[loop below] node[align=center] {\tm{[\ast,a]}{[\ast,a]}R\\ \tm{[\ast,b]}{[\ast,b]}R} ()
+  (2a) edge node {\tm{[B,a]}{[\ast,a]}L} (3) (2b) edge node[swap] {\tm{[B,b]}{[\ast,b]}L} (3)
+  (3) edge[loop right] node[align=center] {\tm{[\ast,a]}{[\ast,a]}L\\ \tm{[\ast,b]}{[\ast,b]}L} ()
+  (3) edge node[swap] {\tm{[B,-]}{[B,-]}L} (4)
+  (4) edge[loop below] node[align=center] {\tm{[B,a]}{[B,a]}L\\ \tm{[B,b]}{[B,b]}L} ()
+  (4) edge node[swap,align=center] {\tm{[\ast,a]}{[\ast,a]}R\\ \tm{[\ast,b]}{[\ast,b]}R} (0)
+  (0) edge node[swap] {\tm{[B,-]}{[B,-]}R} (5)
+  (5) edge[loop below] node[align=center] {\tm{[\ast,a]}{[\ast,a]}R\\ \tm{[\ast,b]}{[\ast,b]}R} ()
+  (5) edge node {\tm{[B,B]}{[B,B]}R} (6);
 \end{tikzpicture}}
-\begin{center}\small\begin{tabular}{l|ccccc}\toprule
-State & $a$ & $b$ & $\text{-}$ & $x$ & $B$\\\midrule
-$\to q_1$ & $(q_a,x,R)$ & $(q_b,x,R)$ & $(q_8,\text{-},R)$ &  & \\
-$q_a$ & $(q_a,a,R)$ & $(q_a,b,R)$ & $(q_a',\text{-},R)$ &  & \\
-$q_a'$ & $(q_6,x,L)$ &  &  & $(q_a',x,R)$ & \\
-$q_b$ & $(q_b,a,R)$ & $(q_b,b,R)$ & $(q_b',\text{-},R)$ &  & \\
-$q_b'$ &  & $(q_6,x,L)$ &  & $(q_b',x,R)$ & \\
-$q_6$ & $(q_6,a,L)$ & $(q_6,b,L)$ & $(q_7,\text{-},L)$ & $(q_6,x,L)$ & \\
-$q_7$ & $(q_7,a,L)$ & $(q_7,b,L)$ &  & $(q_1,x,R)$ & \\
-$q_8$ &  &  &  & $(q_8,x,R)$ & $(q_{acc},B,R)$\\
-$*q_{acc}$ &  &  &  &  & \\\bottomrule\end{tabular}\end{center}
-\par\noindent\textbf{Transition rules ($\sigma\in\{a,b\}$):}
+\textbf{Transition table} (empty entry: no move), split into the unchecked and the checked columns:
+\begin{center}\small\begin{tabular}{l|cccc}\toprule
+State & $[B,a]$ & $[B,b]$ & $[B,-]$ & $[B,B]$\\\midrule
+$\to[q_0,B]$ & $([q_1,a],[\ast,a],R)$ & $([q_1,b],[\ast,b],R)$ & $([q_5,B],[B,-],R)$ & \\
+$[q_1,a]$ & $([q_1,a],[B,a],R)$ & $([q_1,a],[B,b],R)$ & $([q_2,a],[B,-],R)$ & \\
+$[q_1,b]$ & $([q_1,b],[B,a],R)$ & $([q_1,b],[B,b],R)$ & $([q_2,b],[B,-],R)$ & \\
+$[q_2,a]$ & $([q_3,B],[\ast,a],L)$ & & & \\
+$[q_2,b]$ & & $([q_3,B],[\ast,b],L)$ & & \\
+$[q_3,B]$ & & & $([q_4,B],[B,-],L)$ & \\
+$[q_4,B]$ & $([q_4,B],[B,a],L)$ & $([q_4,B],[B,b],L)$ & & \\
+$[q_5,B]$ & & & & $([q_6,B],[B,B],R)$\\
+$*[q_6,B]$ & & & & \\\bottomrule\end{tabular}
+
+\medskip
+\begin{tabular}{l|cc}\toprule
+State & $[\ast,a]$ & $[\ast,b]$\\\midrule
+$[q_2,a]$ & $([q_2,a],[\ast,a],R)$ & $([q_2,a],[\ast,b],R)$\\
+$[q_2,b]$ & $([q_2,b],[\ast,a],R)$ & $([q_2,b],[\ast,b],R)$\\
+$[q_3,B]$ & $([q_3,B],[\ast,a],L)$ & $([q_3,B],[\ast,b],L)$\\
+$[q_4,B]$ & $([q_0,B],[\ast,a],R)$ & $([q_0,B],[\ast,b],R)$\\
+$[q_5,B]$ & $([q_5,B],[\ast,a],R)$ & $([q_5,B],[\ast,b],R)$\\\bottomrule
+\end{tabular}\end{center}
+(All other state/symbol pairs: no move.)
+\par\noindent\textbf{Transition rules:}
 {\small\begin{enumerate}[label=\arabic*.,itemsep=0pt]
-\item $\delta(q_1,\sigma)=(q_\sigma,x,R)$ --- cross off the first unchecked symbol of the left $w$, remember $\sigma$.
-\item $\delta(q_\sigma,s)=(q_\sigma,s,R)$ for $s\in\{a,b\}$; \ $\delta(q_\sigma,\text{-})=(q_\sigma',\text{-},R)$ --- go past ``$-$''.
-\item $\delta(q_\sigma',x)=(q_\sigma',x,R)$; \ $\delta(q_\sigma',\sigma)=(q_6,x,L)$ --- the first unchecked symbol on the right must be $\sigma$: cross it off.
-\item $\delta(q_6,s)=(q_6,s,L)$ for $s\in\{a,b,x\}$; \ $\delta(q_6,\text{-})=(q_7,\text{-},L)$ --- back to ``$-$''.
-\item $\delta(q_7,s)=(q_7,s,L)$ for $s\in\{a,b\}$; \ $\delta(q_7,x)=(q_1,x,R)$ --- back to the last $x$ on the left; next round.
-\item $\delta(q_1,\text{-})=(q_8,\text{-},R)$ --- the left $w$ is used up.
-\item $\delta(q_8,x)=(q_8,x,R)$; \ $\delta(q_8,B)=(q_{acc},B,R)$ --- the right side is fully checked: accept.
+\item $\delta([q_0,B],[B,x])=([q_1,x],[\ast,x],R)$
+\item $\delta([q_1,x],[B,y])=([q_1,x],[B,y],R)$
+\item $\delta([q_1,x],[B,-])=([q_2,x],[B,-],R)$
+\item $\delta([q_2,x],[\ast,y])=([q_2,x],[\ast,y],R)$
+\item $\delta([q_2,x],[B,x])=([q_3,B],[\ast,x],L)$
+\item $\delta([q_3,B],[\ast,y])=([q_3,B],[\ast,y],L)$
+\item $\delta([q_3,B],[B,-])=([q_4,B],[B,-],L)$
+\item $\delta([q_4,B],[B,y])=([q_4,B],[B,y],L)$
+\item $\delta([q_4,B],[\ast,y])=([q_0,B],[\ast,y],R)$
+\item $\delta([q_0,B],[B,-])=([q_5,B],[B,-],R)$
+\item $\delta([q_5,B],[\ast,y])=([q_5,B],[\ast,y],R)$
+\item $\delta([q_5,B],[B,B])=([q_6,B],[B,B],R)$
 \end{enumerate}}
-Missing transitions are undefined: $M$ halts there without accepting. $q_6$ walks back to ``$-$'', $q_7$ walks back to the last $x$ on the left side.
 \end{solution}
 
 %-------------------------------------------------------------------
@@ -4725,24 +4632,30 @@ Missing transitions are undefined: $M$ halts there without accepting. $q_6$ walk
 Build a TM recognizing $L=\{0^N1^N0^N\mid N\ge0\}$.
 \end{question}
 \begin{solution}
-Cross off triples. No separate format pass is needed: the table below already halts without accepting on every string outside $0^*1^*0^*$ (as well as on every string of that form whose blocks are unequal).
-\begin{center}\small\begin{tabular}{l|cccccc}\toprule State & 0 & 1 & $X$ & $Y$ & $Z$ & $B$\\\midrule
-$\to q_0$ & $(q_1,X,R)$ & & & $(q_4,Y,R)$ & & $(q_{acc},B,R)$\\
-$q_1$ & $(q_1,0,R)$ & $(q_2,Y,R)$ & & $(q_1,Y,R)$ & & \\
-$q_2$ & $(q_3,Z,L)$ & $(q_2,1,R)$ & & & $(q_2,Z,R)$ & \\
-$q_3$ & $(q_3,0,L)$ & $(q_3,1,L)$ & $(q_0,X,R)$ & $(q_3,Y,L)$ & $(q_3,Z,L)$ & \\
-$q_4$ & & & & $(q_4,Y,R)$ & $(q_4,Z,R)$ & $(q_{acc},B,R)$\\
-$*q_{acc}$ & & & & & & \\\bottomrule\end{tabular}\end{center}
-\par\noindent\textbf{Transition rules (numbered as in the slides):}
+Same idea as the $a^nb^nc^n$ machine of 2015--2016 Q7(a): each round checks one 0 of block 1, one 1 and one 0 of block 3. Two changes are needed because blocks 1 and 3 use the same symbol 0: the return walk is split into $q_3$ (in block 3), $q_5$ (in block 2) and $q_6$ (in block 1), so a checked 0 of block 3 is never mistaken for the last checked 0 of block 1; and rule 18 accepts $\eps$ ($N=0$).
+
+\textbf{Formal notation.} Two tracks $[t,X]$ ($t\in\{B,\ast\}$ is the check mark, $X\in\{0,1,B\}$). $M=(\{q_0,\dots,q_7\},\Sigma,\Gamma,\delta,q_0,[B,B],\{q_7\})$ with input symbols $[B,0],[B,1]$. The start state is $q_0$; $M$ accepts by entering the final state $q_7$ ($F=\{q_7\}$). If no rule applies in any other state, $M$ halts without accepting, i.e.\ it rejects.
+\par\noindent\textbf{Transition rules:}
 {\small\begin{enumerate}[label=\arabic*.,itemsep=0pt]
-\item $\delta(q_0,0)=(q_1,X,R)$ --- mark the first 0 of block 1.
-\item $\delta(q_1,s)=(q_1,s,R)$ for $s\in\{0,Y\}$; \ $\delta(q_1,1)=(q_2,Y,R)$ --- mark the first 1.
-\item $\delta(q_2,s)=(q_2,s,R)$ for $s\in\{1,Z\}$; \ $\delta(q_2,0)=(q_3,Z,L)$ --- mark the first 0 of block 3.
-\item $\delta(q_3,s)=(q_3,s,L)$ for $s\in\{0,1,Y,Z\}$; \ $\delta(q_3,X)=(q_0,X,R)$ --- back to the rightmost $X$.
-\item $\delta(q_0,Y)=(q_4,Y,R)$; \ $\delta(q_4,s)=(q_4,s,R)$ for $s\in\{Y,Z\}$ --- block 1 used up: only $Y$'s and $Z$'s may follow.
-\item $\delta(q_0,B)=(q_{acc},B,R)$, \ $\delta(q_4,B)=(q_{acc},B,R)$ --- accept.
+\item $\delta(q_0,[B,0])=(q_1,[\ast,0],R)$
+\item $\delta(q_1,[B,0])=(q_1,[B,0],R)$
+\item $\delta(q_1,[\ast,1])=(q_1,[\ast,1],R)$
+\item $\delta(q_1,[B,1])=(q_2,[\ast,1],R)$
+\item $\delta(q_2,[B,1])=(q_2,[B,1],R)$
+\item $\delta(q_2,[\ast,0])=(q_2,[\ast,0],R)$
+\item $\delta(q_2,[B,0])=(q_3,[\ast,0],L)$
+\item $\delta(q_3,[\ast,0])=(q_3,[\ast,0],L)$
+\item $\delta(q_3,[\ast/B,1])=(q_5,[\ast/B,1],L)$
+\item $\delta(q_5,[\ast/B,1])=(q_5,[\ast/B,1],L)$
+\item $\delta(q_5,[B,0])=(q_6,[B,0],L)$
+\item $\delta(q_5,[\ast,0])=(q_0,[\ast,0],R)$
+\item $\delta(q_6,[B,0])=(q_6,[B,0],L)$
+\item $\delta(q_6,[\ast,0])=(q_0,[\ast,0],R)$
+\item $\delta(q_0,[\ast,1])=(q_4,[\ast,1],R)$
+\item $\delta(q_4,[\ast,1/0])=(q_4,[\ast,1/0],R)$
+\item $\delta(q_4,[B,B])=(q_7,[B,B],R)$ \quad $(F=\{q_7\})$
+\item $\delta(q_0,[B,B])=(q_7,[B,B],R)$ \quad (empty input, $N=0$)
 \end{enumerate}}
-$M=(\{q_0,\dots,q_4,q_{acc}\},\{0,1\},\{0,1,X,Y,Z,B\},\delta,q_0,B,\{q_{acc}\})$. Each round turns the first remaining 0 of block 1 into $X$, the first 1 into $Y$, and the first 0 of block 3 into $Z$. Accept when only $Y$'s and $Z$'s remain ($N=0$: $q_0$ scans $B$ and accepts immediately).
 \end{solution}
 
 %-------------------------------------------------------------------
@@ -5193,7 +5106,7 @@ Describe $L(M)$ for $M=(\{q_0,q_1,q_f\},\{0,1\},\{0,1,B\},\delta,q_0,B,\{q_f\})$
 \textbf{The machine.} $q_0$ erases 0's moving right; the first 1 moves it to $q_1$; $q_1$ erases 1's; reaching the blank in $q_1$ accepts. Missing moves ($q_0$ on $B$, $q_1$ on 0) halt without accepting. So the input must be some 0's, then at least one 1, then nothing else. For example,
 \[q_00011\vdash Bq_0011\vdash BBq_011\vdash BBBq_11\vdash BBBBq_1B\vdash BBBBBq_fB\quad(\text{accept}),\]
 while $q_0010\vdash Bq_010\vdash BBq_10$ halts without accepting ($\delta(q_1,0)$ is undefined).
-\ans{$L(M)=0^*1^+=\{0^m1^n\mid m\ge0,\ n\ge1\}$ (and $M$ halts on every input, so it is recursive).}
+\ans{$L(M)$ = strings made of some 0's (possibly none) followed by at least one 1, with no 0 after any 1. In symbols: $0^*1^+=\{0^m1^n\mid m\ge0,\ n\ge1\}$ (and $M$ halts on every input, so it is recursive).}
 \end{solution}
 
 %-------------------------------------------------------------------
@@ -5204,7 +5117,7 @@ Describe $L(M)$ for $M=(\{q_0,q_1,q_f\},\{0,1\},\{0,1,B\},\delta,q_0,B,\{q_f\})$
 \textbf{The machine.} From $q_0$ it must read 0 (go to $q_1$); from $q_1$ it must read 1 (back to $q_0$); in either state a blank accepts; any other symbol halts without accepting. So the input must alternate $0,1,0,1,\dots$ starting with 0, of any length. For example,
 \[q_0010\vdash1q_110\vdash10q_00\vdash101q_1B\vdash101Bq_fB\quad(\text{accept}),\]
 while $q_0011\vdash1q_111\vdash10q_01$ halts without accepting ($\delta(q_0,1)$ is undefined). (The tape ends up holding the complemented bits, which does not affect acceptance.)
-\ans{$L(M)=(01)^*(\eps\cup0)$: $\eps,0,01,010,0101,\dots$ --- alternating strings starting with 0.}
+\ans{$L(M)$ = strings in which 0's and 1's alternate, starting with 0 (no two equal symbols are adjacent), of any length including the empty string: $\eps,0,01,010,0101,\dots$ In symbols: $(01)^*(\eps\cup0)$.}
 \end{solution}
 
 \topic{13}{Turing-machine models, simulation and encoding}
