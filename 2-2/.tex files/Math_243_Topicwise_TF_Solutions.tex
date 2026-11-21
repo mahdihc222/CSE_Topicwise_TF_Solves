@@ -723,23 +723,18 @@ Suppose 500 lottery tickets are sold, and among them, 200 tickets pay off at lea
 The problem interprets ``winning back at least the cost of 3 tickets'' as obtaining at least $3$ winning tickets among the $n = 5$ tickets purchased from the finite population of $N = 500$ tickets ($K = 200$ winning tickets, $N - K = 300$ non-winning tickets).
 
 \medskip
-\textbf{Method 1: Exact Hypergeometric Distribution (Sampling without Replacement).}
-Let $X$ be the number of winning tickets among the 5 purchased. Then
-\[ P(X = x) = \frac{\binom{200}{x}\binom{300}{5-x}}{\binom{500}{5}}, \qquad x = 0, 1, 2, 3, 4, 5. \]
-Here $\binom{500}{5} = 255{,}244{,}687{,}600$. Summing over $x = 3, 4, 5$:
+\textbf{Classical definition of probability (counting with combinations).}
+Five tickets can be chosen from the 500 in $\binom{500}{5} = 255{,}244{,}687{,}600$ equally likely ways (total number of outcomes). Let $X$ be the number of winning tickets among the 5 purchased. The number of favourable ways to get exactly $x$ winning tickets is $\binom{200}{x}\binom{300}{5-x}$ (choose $x$ of the 200 winners and $5-x$ of the 300 non-winners), so
+\[ P(X = x) = \frac{\text{number of favourable outcomes}}{\text{total number of outcomes}} = \frac{\binom{200}{x}\binom{300}{5-x}}{\binom{500}{5}}, \qquad x = 0, 1, \dots, 5. \]
+``At least 3 winning tickets'' means $X = 3$, $4$ or $5$ (mutually exclusive cases, so the probabilities add):
 \begin{align*}
 P(X = 3) &= \frac{\binom{200}{3}\binom{300}{2}}{\binom{500}{5}} = \frac{1{,}313{,}400 \times 44{,}850}{255{,}244{,}687{,}600} \approx 0.230782, \\[3pt]
 P(X = 4) &= \frac{\binom{200}{4}\binom{300}{1}}{\binom{500}{5}} = \frac{64{,}684{,}950 \times 300}{255{,}244{,}687{,}600} \approx 0.076027, \\[3pt]
 P(X = 5) &= \frac{\binom{200}{5}\binom{300}{0}}{\binom{500}{5}} = \frac{2{,}535{,}650{,}040 \times 1}{255{,}244{,}687{,}600} \approx 0.009934.
 \end{align*}
 Adding the three terms gives:
-\[ P(X \ge 3) = 0.230782 + 0.076027 + 0.009934 = 0.316744. \]
-
-\medskip
-\textbf{Method 2: Binomial Approximation (since $n/N = 5/500 = 0.01 \ll 0.05$).}
-With $p = \dfrac{200}{500} = 0.4$ and $q = 1 - p = 0.6$:
-\[ \begin{aligned} P(X \ge 3) &= \sum_{x=3}^{5} \binom{5}{x}(0.4)^x(0.6)^{5-x} = 10(0.4)^3(0.6)^2 + 5(0.4)^4(0.6) + (0.4)^5 \\ &= 0.2304 + 0.0768 + 0.01024 = 0.31744. \end{aligned} \]
-\ans{$P(X \ge 3) = 0.3167$ (exact hypergeometric) or $0.3174$ (binomial approximation).}
+\[ P(X \ge 3) = 0.230782 + 0.076027 + 0.009934 \approx 0.3167. \]
+\ans{$P(\text{at least 3 winning tickets}) \approx 0.3167$.}
 \end{solution}
 
 %---------------------------------------------------------------- P005
@@ -1249,18 +1244,20 @@ The length of time, in minutes, for an airplane to obtain clearance for takeoff 
 Find the mean and variance of the random variable $Y$.
 \end{question}
 \begin{solution}
-First, compute $E(X)$ and $E(X^2)$ using integration by parts (or the gamma integral $\int_0^\infty x^n e^{-x/\beta}\,dx = n!\,\beta^{n+1}$ with $\beta = 4$):
+\textbf{Step 1: $E(X)$ and $E(X^2)$ by direct integration.}
+Using $E(X) = \int_{-\infty}^{\infty} x f(x)\,dx$ and $E[W(X)] = \int_{-\infty}^{\infty} W(x) f(x)\,dx$, with the substitution $u = \frac{x}{4}$ ($x = 4u$, $dx = 4\,du$) and the result $\int_0^\infty u^n e^{-u}\,du = n!$:
 \begin{align*}
-E(X) &= \int_{0}^{\infty} x\cdot\frac{1}{4}e^{-x/4}\,dx = \frac{1}{4}\left(1!\times 4^2\right) = 4, \\[4pt]
-E(X^2) &= \int_{0}^{\infty} x^2\cdot\frac{1}{4}e^{-x/4}\,dx = \frac{1}{4}\left(2!\times 4^3\right) = 32.
+E(X) &= \int_{0}^{\infty} x\cdot\frac{1}{4}e^{-x/4}\,dx = \int_{0}^{\infty} 4u\cdot\frac{1}{4}e^{-u}\cdot 4\,du = 4\int_{0}^{\infty} u\,e^{-u}\,du = 4(1!) = 4, \\[4pt]
+E(X^2) &= \int_{0}^{\infty} x^2\cdot\frac{1}{4}e^{-x/4}\,dx = \int_{0}^{\infty} 16u^2\cdot\frac{1}{4}e^{-u}\cdot 4\,du = 16\int_{0}^{\infty} u^2 e^{-u}\,du = 16(2!) = 32.
 \end{align*}
-Hence, the variance of $X$ is:
-\[ \operatorname{Var}(X) = E(X^2) - [E(X)]^2 = 32 - 4^2 = 16. \]
-Using the linear properties of expectation and variance for $Y = 3X - 2$:
-\begin{align*}
-E(Y) &= E(3X - 2) = 3E(X) - 2 = 3(4) - 2 = 10\text{ minutes}, \\[4pt]
-\operatorname{Var}(Y) &= \operatorname{Var}(3X - 2) = 3^2\operatorname{Var}(X) = 9 \times 16 = 144\text{ minutes}^2.
-\end{align*}
+
+\textbf{Step 2: Mean of $Y$.} Using $E(C) = C$ and $E(aX + b) = aE(X) + b$:
+\[ E(Y) = E(3X - 2) = 3E(X) - 2 = 3(4) - 2 = 10\text{ minutes}. \]
+
+\textbf{Step 3: Variance of $Y$.} Using $V(Y) = E(Y^2) - [E(Y)]^2$, first find $E(Y^2)$:
+\[ E(Y^2) = E\big[(3X - 2)^2\big] = E(9X^2 - 12X + 4) = 9E(X^2) - 12E(X) + 4 = 9(32) - 12(4) + 4 = 244. \]
+Hence,
+\[ V(Y) = E(Y^2) - [E(Y)]^2 = 244 - 10^2 = 144\text{ minutes}^2. \]
 \ans{Mean $E(Y) = 10\text{ minutes}$, \qquad Variance $\operatorname{Var}(Y) = 144\text{ minutes}^2$.}
 \end{solution}
 
@@ -1308,7 +1305,6 @@ Computing the probability for each $x$:
 \end{itemize}
 By definition of mathematical expectation:
 \[ E(X) = \sum_{x=0}^{3} x\,P(X = x) = 0 + 1\left(\frac{12}{35}\right) + 2\left(\frac{18}{35}\right) + 3\left(\frac{4}{35}\right) = \frac{60}{35} = \frac{12}{7} \approx 1.7143. \]
-\textit{(Direct hypergeometric mean check: $E(X) = n\cdot\dfrac{K}{N} = 3 \times \dfrac{4}{7} = \dfrac{12}{7}$. \ok)}
 \ans{The expected number of good components is $E(X) = \dfrac{12}{7} \approx 1.7143$.}
 \end{solution}
 
@@ -1635,11 +1631,11 @@ Since $f'(\mu) = 0$ and $f''(\mu) < 0$, $f(x)$ attains its unique global maximum
 \textbf{Part 2: Electric Bulb Lifetime Probability.}
 Given $X \sim N(\mu = 800, \sigma^2 = 40^2)$. Standardizing to $Z = \dfrac{X - \mu}{\sigma}$ at $x_1 = 778$ and $x_2 = 834$:
 \[ z_1 = \frac{778 - 800}{40} = \frac{-22}{40} = -0.55, \qquad z_2 = \frac{834 - 800}{40} = \frac{34}{40} = 0.85. \]
-From the attached cumulative standard normal table ($\Phi(z) = P(Z \le z)$):
-\[ \Phi(0.85) = 0.802337, \qquad \Phi(-0.55) = 1 - \Phi(0.55) = 1 - 0.708840 = 0.291160. \]
+Hence $P(778 < X < 834) = P(-0.55 < Z < 0.85)$. From the attached standard normal table (areas to the left, $P(Z < z)$):
+\[ P(Z < 0.85) = 0.8023, \qquad P(Z < -0.55) = 0.2912. \]
 Therefore,
-\[ P(778 < X < 834) = \Phi(0.85) - \Phi(-0.55) = 0.802337 - 0.291160 = 0.511177. \]
-\ans{$\text{Mode} = \mu$; \qquad $P(778 < X < 834) \approx 0.5112$.}
+\[ P(778 < X < 834) = P(Z < 0.85) - P(Z < -0.55) = 0.8023 - 0.2912 = 0.5111. \]
+\ans{$\text{Mode} = \mu$; \qquad $P(778 < X < 834) \approx 0.5111$.}
 \end{solution}
 
 %---------------------------------------------------------------- P040
@@ -1706,11 +1702,9 @@ In an industrial process, the buyer sets specifications on the diameter of a bal
 \begin{solution}
 Let $X \sim N(\mu = 3.0, \sigma = 0.005)$ be the diameter of a ball bearing in cm. The acceptable specification interval is $[3.0 - 0.01, 3.0 + 0.01] = [2.99, 3.01]$. Standardizing the lower and upper limits:
 \[ z_1 = \frac{2.99 - 3.0}{0.005} = -2.0, \qquad z_2 = \frac{3.01 - 3.0}{0.005} = +2.0. \]
-The probability that a bearing is accepted is:
-\[ P(2.99 \le X \le 3.01) = P(-2.0 \le Z \le 2.0) = 2\Phi(2.0) - 1. \]
-From the attached Table 1, $\Phi(2.0) = 0.97725$. Therefore, the probability that a bearing falls outside specifications and is scrapped is:
-\[ P(\text{scrapped}) = 1 - P(-2.0 \le Z \le 2.0) = 2\big(1 - \Phi(2.0)\big) = 2(1 - 0.97725) = 0.0455. \]
-\ans{On average, $4.55\%$ (or $455$ out of every $10{,}000$) of the manufactured ball bearings will be scrapped.}
+Hence $P(2.99 < X < 3.01) = P(-2.0 < Z < 2.0)$. From the attached Table 1, $P(Z < -2.0) = 0.0228$. Due to the symmetry of the normal distribution, the probability that a bearing falls outside the specifications (and is scrapped) is:
+\[ P(\text{scrapped}) = P(Z < -2.0) + P(Z > 2.0) = 2(0.0228) = 0.0456. \]
+\ans{On average, $4.56\%$ (about $456$ out of every $10{,}000$) of the manufactured ball bearings will be scrapped.}
 \end{solution}
 
 %---------------------------------------------------------------- P043
@@ -1894,12 +1888,16 @@ Stratified random sampling is a probability sampling technique in which a hetero
 
 \medskip
 \textbf{Part 2: Hypothesis Test on Medicine Delivery Time.}
-Given $\mu_0 = 120\text{ min}$, $\sigma = 30\text{ min}$, $n = 49$, $\bar{x} = 100\text{ min}$, and $\alpha = 0.05$:
+Here $\sigma = 30$ is known, so the $z$-test (normal test) is used, with $\mu_0 = 120$, $n = 49$, $\bar{x} = 100$.
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 120\text{ min}$ vs.\ $H_1: \mu < 120\text{ min}$ (left-tailed test supporting the shop's claim).
-\item \textbf{Test Statistic:}
-\[ z = \frac{\bar{x} - \mu_0}{\sigma/\sqrt{n}} = \frac{100 - 120}{30/\sqrt{49}} = \frac{-20}{30/7} = -\frac{14}{3} \approx -4.667. \]
-\item \textbf{Decision Rule \& Conclusion:} At $\alpha = 0.05$, the critical value is $z_{0.05} = -1.645$. Since $z = -4.667 < -1.645$, we reject $H_0$.
+\item \textbf{Hypothesis:} $H_0: \mu = 120$ against $H_1: \mu < 120$ (left-tailed test; $H_1$ is the shop's claim).
+\item \textbf{Level of significance:} $\alpha = 0.05$.
+\item \textbf{Critical value \& region:} One-tailed (left) test, $z_\alpha = z_{0.05} = -1.645$. Critical region: $z < -1.645$.
+\item \textbf{Test statistic:} $z = \dfrac{\bar{x} - \mu_0}{\sigma/\sqrt{n}} \sim N(0,1)$.
+\item \textbf{Calculated value:}
+\[ z = \frac{100 - 120}{30/\sqrt{49}} = \frac{-20}{30/7} = -\frac{14}{3} \approx -4.667. \]
+\item \textbf{Comparison and decision:} Since $z = -4.667 < -1.645$, the calculated value falls in the critical region; we reject $H_0$ at the $5\%$ level.
+\item \textbf{Comment:} The mean delivery time is less than $120$ minutes; the shop's claim is supported.
 \end{enumerate}
 \ans{$z = -4.67 < -1.645$; reject $H_0$. There is strong statistical evidence at the $5\%$ level to support the claim that mean delivery time is less than $120\text{ minutes}$.}
 \end{solution}
@@ -1925,16 +1923,19 @@ A machine puts out 16 imperfect articles in a sample of 500. After the machine i
 Let $p_1$ and $p_2$ denote the population proportions of imperfect articles before and after overhaul, respectively.
 Given $n_1 = 500,\ x_1 = 16 \implies \hat{p}_1 = \dfrac{16}{500} = 0.032$, and $n_2 = 100,\ x_2 = 3 \implies \hat{p}_2 = \dfrac{3}{100} = 0.030$.
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: p_1 = p_2$ vs.\ $H_1: p_1 > p_2$ (machine improved, so defect rate decreased).
-\item \textbf{Pooled Proportion \& Test Statistic:}
-Under $H_0$, the pooled sample proportion is:
-\[ \hat{p} = \frac{x_1 + x_2}{n_1 + n_2} = \frac{16 + 3}{500 + 100} = \frac{19}{600} \approx 0.03167, \qquad \hat{q} = 1 - \hat{p} = \frac{581}{600} \approx 0.96833. \]
-The two-proportion $z$-statistic is:
-\[ z = \frac{\hat{p}_1 - \hat{p}_2}{\sqrt{\hat{p}\hat{q}\left(\frac{1}{n_1} + \frac{1}{n_2}\right)}} = \frac{0.032 - 0.030}{\sqrt{(0.03167)(0.96833)\left(\frac{1}{500} + \frac{1}{100}\right)}} = \frac{0.002}{0.01918} \approx 0.1043. \]
-\textit{(Note: Even if treated as a one-sample test of $\hat{p}_2 = 0.030$ against historical $p_0 = 0.032$, $|z| = \frac{|0.030-0.032|}{\sqrt{0.032(0.968)/100}} = 0.1136$.)}
-\item \textbf{Decision:} At $\alpha = 0.01$, $|z| = 0.1043 \ll 2.58$ (and $z_{0.01} = 2.33$ one-tailed). Fail to reject $H_0$.
+\item \textbf{Hypothesis:} $H_0: p_1 = p_2$ against $H_1: p_1 > p_2$ (machine improved, so the defect rate decreased).
+\item \textbf{Level of significance:} $\alpha = 0.01$.
+\item \textbf{Pooled proportion:}
+\[ \hat{p} = \frac{x_1 + x_2}{n_1 + n_2} = \frac{16 + 3}{500 + 100} = \frac{19}{600} \approx 0.03167, \qquad 1 - \hat{p} \approx 0.96833. \]
+\item \textbf{Standard error:}
+\[ SE = \sqrt{\hat{p}(1-\hat{p})\left(\frac{1}{n_1} + \frac{1}{n_2}\right)} = \sqrt{0.03167 \times 0.96833\left(\frac{1}{500} + \frac{1}{100}\right)} = \sqrt{0.000368} \approx 0.01918. \]
+\item \textbf{Test statistic (calculated value):}
+\[ Z = \frac{\hat{p}_1 - \hat{p}_2}{\sqrt{\hat{p}(1-\hat{p})\left(\frac{1}{n_1} + \frac{1}{n_2}\right)}} = \frac{0.032 - 0.030}{0.01918} \approx 0.104. \]
+\item \textbf{Critical value:} At the $1\%$ level of significance the given tabulated value is $Z_{\text{tab}} = 2.58$. Critical region: $Z > 2.58$. (For a strictly one-tailed test $z_{0.99} = 2.33$; the decision is the same.)
+\item \textbf{Decision:} $Z_{\text{cal}} = 0.104 < 2.58$ (and $< 2.33$) $\Rightarrow$ fail to reject $H_0$.
+\item \textbf{Conclusion:} The fall in the defect proportion from $3.2\%$ to $3\%$ is not significant.
 \end{enumerate}
-\ans{$z = 0.1043 < 2.58$; fail to reject $H_0$. There is no statistically significant evidence at the $1\%$ level that the machine has improved.}
+\ans{$Z = 0.104 < 2.58$; fail to reject $H_0$. There is no statistically significant evidence at the $1\%$ level that the machine has improved.}
 \end{solution}
 
 %---------------------------------------------------------------- P054
@@ -1951,7 +1952,9 @@ Two independent samples of 8 and 7 items, respectively, had the following values
 \end{question}
 \begin{solution}
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu_1 = \mu_2$ vs.\ $H_1: \mu_1 \neq \mu_2$ (two-tailed independent two-sample $t$-test with $\nu = n_1 + n_2 - 2 = 8 + 7 - 2 = 13$).
+\item \textbf{Hypothesis:} $H_0: \mu_1 = \mu_2$ against $H_1: \mu_1 \neq \mu_2$ (variances unknown but assumed equal, small samples $\Rightarrow$ pooled $t$-test with $\nu = n_1 + n_2 - 2 = 8 + 7 - 2 = 13$).
+\item \textbf{Level of significance:} $\alpha = 0.05$. Two-tailed critical values $\pm t_{\alpha/2,\,n_1+n_2-2} = \pm 2.16$; critical region: $t < -2.16$ or $t > 2.16$.
+\item \textbf{Test statistic:} $t = \dfrac{\bar{x}_1 - \bar{x}_2}{s\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}} \sim t_{n_1+n_2-2}$.
 \item \textbf{Sample Means and Sums of Squares:}
 \begin{itemize}
 \item \textbf{Sample I ($n_1 = 8$):} $\sum x_{1i} = 94 \implies \bar{x}_1 = \dfrac{94}{8} = 11.75$.
@@ -1959,10 +1962,11 @@ Two independent samples of 8 and 7 items, respectively, had the following values
 \item \textbf{Sample II ($n_2 = 7$):} $\sum x_{2j} = 73 \implies \bar{x}_2 = \dfrac{73}{7} \approx 10.4286$.
 \[ \sum (x_{2j} - \bar{x}_2)^2 = \sum x_{2j}^2 - \frac{(\sum x_{2j})^2}{7} = 785 - \frac{5329}{7} = 785 - 761.2857 = 23.7143. \]
 \end{itemize}
-\item \textbf{Pooled Variance and $t$-Statistic:}
-\[ s_p^2 = \frac{\sum (x_{1i} - \bar{x}_1)^2 + \sum (x_{2j} - \bar{x}_2)^2}{n_1 + n_2 - 2} = \frac{33.50 + 23.7143}{13} = \frac{57.2143}{13} \approx 4.4011 \implies s_p \approx 2.0979, \]
-\[ t = \frac{\bar{x}_1 - \bar{x}_2}{s_p\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}} = \frac{11.75 - 10.4286}{2.0979\sqrt{\frac{1}{8} + \frac{1}{7}}} = \frac{1.3214}{2.0979 \times 0.51755} = \frac{1.3214}{1.0858} \approx 1.217. \]
-\item \textbf{Decision:} Since $|t| = 1.217 < t_{0.05, 13} = 2.16$, we fail to reject $H_0$.
+\item \textbf{Pooled variance and calculated value:}
+\[ s^2_{\text{pooled}} = \frac{\sum (x_{1i} - \bar{x}_1)^2 + \sum (x_{2j} - \bar{x}_2)^2}{(n_1 - 1) + (n_2 - 1)} = \frac{33.50 + 23.7143}{13} = \frac{57.2143}{13} \approx 4.4011 \implies s \approx 2.0979, \]
+\[ t = \frac{11.75 - 10.4286}{2.0979\sqrt{\frac{1}{8} + \frac{1}{7}}} = \frac{1.3214}{2.0979 \times 0.51755} = \frac{1.3214}{1.0858} \approx 1.217. \]
+\item \textbf{Comparison and decision:} $-2.16 < t = 1.217 < 2.16$, so $t$ falls in the acceptance region; we fail to reject $H_0$.
+\item \textbf{Comment:} The two population mean weights do not differ significantly.
 \end{enumerate}
 \ans{$t = 1.217 < 2.16$; fail to reject $H_0$. The difference between the sample means is not statistically significant at the $5\%$ level.}
 \end{solution}
@@ -1986,10 +1990,10 @@ Fair & 10 & 30 & 20 & 60 \\
 \end{question}
 \begin{solution}
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:}
+\item \textbf{Hypothesis:}
 \begin{itemize}
-\item $H_0$: Educational attainment and job performance are independent (no relationship).
-\item $H_1$: Educational attainment and job performance are associated.
+\item $H_0$: There is no association between educational attainment and job performance.
+\item $H_1$: There is association between educational attainment and job performance.
 \end{itemize}
 \item \textbf{Expected Frequencies ($E_{ij} = \dfrac{R_i \times C_j}{N}$ with $N = 200$):}
 \begin{center}\small
@@ -2010,7 +2014,8 @@ Fair ($R_3=60$) & $O_{31}=10,\ E_{31}=15$ & $O_{32}=30,\ E_{32}=30$ & $O_{33}=20
        &= \frac{25}{15} + \frac{100}{30} + \frac{25}{15} + \frac{100}{20} + \frac{100}{40} + 0 + \frac{25}{15} + 0 + \frac{25}{15} \\
        &= \frac{5}{3} + \frac{10}{3} + \frac{5}{3} + 5 + 2.5 + \frac{5}{3} + \frac{5}{3} = 10 + 7.5 = 17.50.
 \end{align*}
-\item \textbf{Decision:} Since $\chi^2 = 17.50 > \chi^2_{0.05, 4} = 9.49$, we reject $H_0$.
+\item \textbf{Level of significance \& critical value:} $\alpha = 0.05$; the test is one-tailed (upper tail) with critical value $\chi^2_{\alpha,(r-1)(p-1)} = \chi^2_{0.05,4} = 9.49$.
+\item \textbf{Decision:} Since $\chi^2 = 17.50 \ge 9.49$, we reject $H_0$; there is association between educational attainment and job performance.
 \end{enumerate}
 \ans{$\chi^2 = 17.50 > 9.49$; reject $H_0$. There is a statistically significant relationship between educational attainment and job performance at the $5\%$ level.}
 \end{solution}
@@ -2041,12 +2046,14 @@ The mean and standard deviation of GPA scores obtained from a random sample of 4
 \begin{solution}
 Given sample size $n = 40$ (large sample, $n \ge 30$), sample mean $\bar{x} = 2.8$, sample standard deviation $s = 0.35$, hypothesized population mean $\mu_0 = 2.4$, and significance level $\alpha = 0.01$ ($z_{\alpha/2} = \pm 2.58$).
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 2.4$ vs.\ $H_1: \mu \neq 2.4$ (two-tailed test).
-\item \textbf{Standard Error and Test Statistic:}
-\[ \text{SE} = \frac{s}{\sqrt{n}} = \frac{0.35}{\sqrt{40}} \approx 0.05534, \qquad z = \frac{\bar{x} - \mu_0}{s/\sqrt{n}} = \frac{2.8 - 2.4}{0.05534} \approx 7.228. \]
-\item \textbf{Decision:} Since $|z| = 7.228 > 2.58$, we reject $H_0$. We cannot conclude that the sample comes from a population with mean GPA $2.4$.
-\item \textbf{99\% Confidence Interval for the Population Mean $\mu$:}
-\[ \bar{x} \pm z_{0.005}\frac{s}{\sqrt{n}} = 2.8 \pm 2.58(0.05534) = 2.8 \pm 0.1428 = [2.6572,\ 2.9428]. \]
+\item \textbf{Hypothesis:} $H_0: \mu = 2.4$ against $H_1: \mu \neq 2.4$ (two-tailed test).
+\item \textbf{Level of significance:} $\alpha = 0.01$; critical values $z_{\alpha/2} = -2.58$ and $z_{1-\alpha/2} = 2.58$. Critical region: $z < -2.58$ or $z > 2.58$.
+\item \textbf{Test statistic:} $\sigma$ unknown but estimated from a large sample, so $z = \dfrac{\bar{x} - \mu_0}{s/\sqrt{n}} \sim N(0,1)$.
+\item \textbf{Calculated value:}
+\[ \frac{s}{\sqrt{n}} = \frac{0.35}{\sqrt{40}} \approx 0.05534, \qquad z = \frac{2.8 - 2.4}{0.05534} \approx 7.228. \]
+\item \textbf{Comparison and decision:} $z = 7.228 > 2.58$ falls in the critical region, so we reject $H_0$. We cannot conclude that the sample comes from a population with mean GPA $2.4$.
+\item \textbf{99\% Confidence Interval for $\mu$:}
+\[ \begin{aligned} &\bar{x} - 2.58\frac{s}{\sqrt{n}} \le \mu \le \bar{x} + 2.58\frac{s}{\sqrt{n}} \\ \implies\ &2.8 - 2.58(0.05534) \le \mu \le 2.8 + 2.58(0.05534) \\ \implies\ &2.6572 \le \mu \le 2.9428. \end{aligned} \]
 \end{enumerate}
 \ans{$z = 7.23 > 2.58$; reject $H_0$. The $99\%$ confidence interval for $\mu$ is $[2.657,\ 2.943]$.}
 \end{solution}
@@ -2058,11 +2065,13 @@ The average waiting time in a bank counter to cash a cheque for all customers ha
 \begin{solution}
 Given $\mu_0 = 50\text{ min}$, $n = 12$, $\bar{x} = 42\text{ min}$, $s = 11.9\text{ min}$, $\nu = n - 1 = 11$, and $\alpha = 0.05$.
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 50\text{ min}$ vs.\ $H_1: \mu < 50\text{ min}$ (left-tailed $t$-test).
-\item \textbf{Test Statistic:}
-\[ t = \frac{\bar{x} - \mu_0}{s/\sqrt{n}} = \frac{42 - 50}{11.9/\sqrt{12}} = \frac{-8}{3.4352} \approx -2.329. \]
-\textit{(Note: If $11.9$ is treated as unadjusted sample root-mean-square deviation dividing by $\sqrt{n-1}=\sqrt{11}$, $t = \frac{-8}{11.9/\sqrt{11}} \approx -2.230$.)}
-\item \textbf{Decision:} For a left-tailed test at $\alpha = 0.05$ with $\nu = 11$, the critical value is $-t_{0.05, 11} = -1.796$. Since $t = -2.329 < -1.796$, we reject $H_0$.
+\item \textbf{Hypothesis:} $H_0: \mu = 50$ against $H_1: \mu < 50$ (left-tailed; $\sigma$ unknown, small sample $\Rightarrow$ $t$-test).
+\item \textbf{Level of significance:} $\alpha = 0.05$; critical value $-t_{\alpha,n-1} = -t_{0.05,11} = -1.796$. Critical region: $t < -1.796$.
+\item \textbf{Test statistic:} $t = \dfrac{\bar{x} - \mu_0}{s/\sqrt{n}} \sim t_{n-1}$.
+\item \textbf{Calculated value:}
+\[ t = \frac{42 - 50}{11.9/\sqrt{12}} = \frac{-8}{3.4352} \approx -2.329. \]
+\item \textbf{Comparison and decision:} $t = -2.329 < -1.796$ falls in the critical region, so we reject $H_0$.
+\item \textbf{Comment:} The new system has reduced the mean waiting time below $50$ minutes.
 \end{enumerate}
 \ans{$t = -2.329 < -1.796$; reject $H_0$. The population mean waiting time under the new system is significantly less than $50\text{ minutes}$.}
 \end{solution}
@@ -2086,17 +2095,18 @@ Based on these data, can it be concluded that the drug is effective in preventin
 \end{question}
 \begin{solution}
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0$: The drug and typhoid incidence are independent (drug is not effective) vs.\ $H_1$: The drug is effective in preventing typhoid.
-\item \textbf{Expected Frequencies ($E_{ij} = \dfrac{R_i \times C_j}{800}$):}
-\begin{itemize}
-\item $E_{11} \ (\text{Drug, Typhoid}) = \dfrac{500 \times 480}{800} = 300$, \qquad $E_{12} \ (\text{Drug, No Typhoid}) = \dfrac{500 \times 320}{800} = 200$,
-\item $E_{21} \ (\text{No Drug, Typhoid}) = \dfrac{300 \times 480}{800} = 180$, \quad $E_{22} \ (\text{No Drug, No Typhoid}) = \dfrac{300 \times 320}{800} = 120$.
-\end{itemize}
-\item \textbf{Chi-Square Test Statistic ($\nu = (2-1)(2-1) = 1$):}
-\[ \begin{aligned} \chi^2 &= \sum \frac{(O_{ij} - E_{ij})^2}{E_{ij}} = \frac{(-100)^2}{300} + \frac{100^2}{200} + \frac{100^2}{180} + \frac{(-100)^2}{120} \\ &= 33.33 + 50.00 + 55.56 + 83.33 = 222.22. \end{aligned} \]
-\item \textbf{Decision:} Since $\chi^2 = 222.22 \gg \chi^2_{0.05, 1} = 3.84$, we reject $H_0$.
+\item \textbf{Hypothesis:} $H_0$: There is no association between taking the drug and typhoid (drug not effective) against $H_1$: There is association between taking the drug and typhoid.
+\item \textbf{$2\times 2$ contingency table:} with the slides' notation,
+\[ a = 200,\quad b = 300,\quad c = 280,\quad d = 20, \]
+\[ R_1 = a+b = 500,\quad R_2 = c+d = 300,\quad C_1 = a+c = 480,\quad C_2 = b+d = 320,\quad N = 800. \]
+\item \textbf{Test statistic ($2\times 2$ table, 1 d.f.):}
+\[ \chi^2 = \frac{N\left(|ad - bc| - \frac{N}{2}\right)^2}{(a+b)(a+c)(c+d)(b+d)} \sim \chi^2_1. \]
+\item \textbf{Calculated value:} $ad - bc = 200(20) - 300(280) = 4000 - 84000 = -80000$, so $|ad - bc| - \frac{N}{2} = 80000 - 400 = 79600$.
+\[ \chi^2 = \frac{800 \times 79600^2}{500 \times 480 \times 300 \times 320} = \frac{5.068928 \times 10^{12}}{2.304 \times 10^{10}} \approx 220.01. \]
+\item \textbf{Level of significance \& critical value:} $\alpha = 0.05$; one-tailed test, $\chi^2_{\alpha,1} = \chi^2_{0.05,1} = 3.84$.
+\item \textbf{Decision:} Since $\chi^2 = 220.01 \ge 3.84$, we reject $H_0$. Among drug-takers only $200/500 = 40\%$ got typhoid against $280/300 \approx 93\%$ of non-takers, so the association is in favour of the drug.
 \end{enumerate}
-\ans{$\chi^2 = 222.22 > 3.84$; reject $H_0$. The drug is highly effective in preventing typhoid.}
+\ans{$\chi^2 = 220.01 > 3.84$; reject $H_0$. The drug is effective in preventing typhoid.}
 \end{solution}
 
 %---------------------------------------------------------------- P060
@@ -2105,15 +2115,17 @@ Ten individuals are chosen at random from a population and their heights are fou
 \end{question}
 \begin{solution}
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 65\text{ inches}$ vs.\ $H_1: \mu \neq 65\text{ inches}$ ($\alpha = 0.05$, $\nu = n - 1 = 9$).
+\item \textbf{Hypothesis:} $H_0: \mu = 65$ against $H_1: \mu \neq 65$ ($\sigma$ unknown, small sample $\Rightarrow$ $t$-test, $\nu = n - 1 = 9$).
+\item \textbf{Level of significance:} $\alpha = 0.05$; critical values $\pm t_{\alpha/2,n-1} = \pm 2.262$. Critical region: $t < -2.262$ or $t > 2.262$.
 \item \textbf{Sample Mean and Standard Deviation ($n = 10$):}
 \[ \bar{x} = \frac{63 + 63 + 64 + 65 + 66 + 69 + 69 + 70 + 70 + 71}{10} = \frac{670}{10} = 67.0\text{ inches}. \]
 Deviations $x_i - \bar{x}$ are $-4, -4, -3, -2, -1, +2, +2, +3, +3, +4$, so:
 \[ \sum_{i=1}^{10} (x_i - \bar{x})^2 = 16 + 16 + 9 + 4 + 1 + 4 + 4 + 9 + 9 + 16 = 88, \]
 \[ s = \sqrt{\frac{\sum (x_i - \bar{x})^2}{n - 1}} = \sqrt{\frac{88}{9}} \approx 3.1269\text{ inches}. \]
-\item \textbf{Test Statistic \& Decision:}
+\item \textbf{Test statistic and calculated value:}
 \[ t = \frac{\bar{x} - \mu_0}{s/\sqrt{n}} = \frac{67.0 - 65.0}{3.1269/\sqrt{10}} = \frac{2.0}{0.9888} \approx 2.0226. \]
-Since $|t| = 2.0226 < t_{0.05, 9} = 2.262$, we fail to reject $H_0$.
+\item \textbf{Comparison and decision:} $-2.262 < t = 2.023 < 2.262$ falls in the acceptance region; we fail to reject $H_0$.
+\item \textbf{Comment:} The data support the suggestion that the mean height of the universe is $65$ inches.
 \end{enumerate}
 \ans{$t = 2.023 < 2.262$; fail to reject $H_0$. The sample is consistent with the suggestion that the population mean height is $65\text{ inches}$.}
 \end{solution}
@@ -2125,10 +2137,13 @@ The human requirement for salt is 220 milligrams per day. If a random sample of 
 \begin{solution}
 Given $\mu_0 = 220\text{ mg}$, $n = 20$, $\bar{x} = 244\text{ mg}$, $s = 24.5\text{ mg}$, $\nu = n - 1 = 19$, and $\alpha = 0.05$.
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 220\text{ mg}$ vs.\ $H_1: \mu > 220\text{ mg}$ (right-tailed $t$-test).
-\item \textbf{Test Statistic:}
-\[ t = \frac{\bar{x} - \mu_0}{s/\sqrt{n}} = \frac{244 - 220}{24.5/\sqrt{20}} = \frac{24}{5.4784} \approx 4.381. \]
-\item \textbf{Decision:} From Table 3 (Student's $t$-distribution), for $\nu = 19$ and one-tailed $\alpha = 0.05$, the critical value is $t_{0.05, 19} = 1.729$. Since $t = 4.381 > 1.729$, we reject $H_0$.
+\item \textbf{Hypothesis:} $H_0: \mu = 220$ against $H_1: \mu > 220$ (right-tailed; $\sigma$ unknown, small sample $\Rightarrow$ $t$-test).
+\item \textbf{Level of significance:} $\alpha = 0.05$; from the $t$-table, $t_{\alpha,n-1} = t_{0.05,19} = 1.729$. Critical region: $t > 1.729$.
+\item \textbf{Test statistic:} $t = \dfrac{\bar{x} - \mu_0}{s/\sqrt{n}} \sim t_{n-1}$.
+\item \textbf{Calculated value:}
+\[ t = \frac{244 - 220}{24.5/\sqrt{20}} = \frac{24}{5.4784} \approx 4.381. \]
+\item \textbf{Comparison and decision:} $t = 4.381 > 1.729$ falls in the critical region, so we reject $H_0$.
+\item \textbf{Comment:} The average sodium content per serving is greater than $220$ mg.
 \end{enumerate}
 \ans{$t = 4.381 > 1.729$; reject $H_0$. The data strongly suggest that the average sodium content per serving exceeds $220\text{ mg}$.}
 \end{solution}
@@ -2159,15 +2174,16 @@ A medical student claims that mice with an average life span of 32 months will l
 \begin{solution}
 Given $\mu_0 = 40\text{ months}$, $n = 64$ (large sample), $\bar{x} = 38\text{ months}$, and $s = 5.8\text{ months}$:
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 40\text{ months}$ vs.\ $H_1: \mu < 40\text{ months}$ (left-tailed test).
-\item \textbf{Test Statistic:}
-\[ z = \frac{\bar{x} - \mu_0}{s/\sqrt{n}} = \frac{38 - 40}{5.8/\sqrt{64}} = \frac{-2}{5.8/8} = \frac{-16}{5.8} \approx -2.7586 \ (\approx -2.76). \]
-\item \textbf{P-value \& Conclusion:}
-The left-tailed P-value is:
-\[ \text{P-value} = P(Z \le -2.76) = \Phi(-2.76) \approx 0.0029. \]
-Since $\text{P-value} = 0.0029 < 0.01$ (and $< 0.05$), the result is highly statistically significant, so we reject $H_0$.
+\item \textbf{Hypothesis:} $H_0: \mu = 40$ against $H_1: \mu < 40$ (left-tailed test).
+\item \textbf{Level of significance:} not stated; we consider $\alpha = 0.05$ (as in the slides).
+\item \textbf{Test statistic:} $\sigma$ unknown but estimated from a large sample ($n = 64 \ge 30$), so $z = \dfrac{\bar{x} - \mu_0}{s/\sqrt{n}} \sim N(0,1)$.
+\item \textbf{Calculated value:}
+\[ z_{cal} = \frac{38 - 40}{5.8/\sqrt{64}} = \frac{-2}{5.8/8} = \frac{-16}{5.8} \approx -2.76. \]
+\item \textbf{p-value} (left-tailed test, from the $Z$ table):
+\[ p\text{-value} = P[Z \le z_{cal}] = P[Z \le -2.76] = 1 - P[Z \le 2.76] = 1 - 0.9971 = 0.0029. \]
+\item \textbf{Decision:} $p\text{-value} = 0.0029 \le \alpha = 0.05$ (it is even below $0.01$), so we reject $H_0$.
 \end{enumerate}
-\ans{$z = -2.76$, $\text{P-value} = 0.0029 < 0.01$; reject $H_0$. There is strong evidence to believe that $\mu < 40\text{ months}$.}
+\ans{$z = -2.76$, $p\text{-value} = 0.0029 < 0.05$ (and $< 0.01$); reject $H_0$. There is strong evidence to believe that $\mu < 40\text{ months}$.}
 \end{solution}
 
 %---------------------------------------------------------------- P065
@@ -2177,10 +2193,13 @@ A random sample of 100 recorded deaths in Bangladesh during the past year showed
 \begin{solution}
 Given $\mu_0 = 60\text{ years}$, $\sigma = 4.9\text{ years}$, $n = 100$, $\bar{x} = 61.8\text{ years}$, and $\alpha = 0.05$:
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 60\text{ years}$ vs.\ $H_1: \mu > 60\text{ years}$ (right-tailed $z$-test).
-\item \textbf{Test Statistic:}
-\[ z = \frac{\bar{x} - \mu_0}{\sigma/\sqrt{n}} = \frac{61.8 - 60}{4.9/\sqrt{100}} = \frac{1.8}{0.49} \approx 3.6735. \]
-\item \textbf{Decision:} At $\alpha = 0.05$, the critical value is $z_{0.05} = 1.645$. Since $z = 3.67 > 1.645$ (with $\text{P-value} = 1 - \Phi(3.67) \approx 0.00012$), we reject $H_0$.
+\item \textbf{Hypothesis:} $H_0: \mu = 60$ against $H_1: \mu > 60$ (right-tailed; $\sigma$ known $\Rightarrow$ $z$-test).
+\item \textbf{Level of significance:} $\alpha = 0.05$; critical value $z_{1-\alpha} = z_{0.95} = 1.645$. Critical region: $z > 1.645$.
+\item \textbf{Test statistic:} $z = \dfrac{\bar{x} - \mu_0}{\sigma/\sqrt{n}} \sim N(0,1)$.
+\item \textbf{Calculated value:}
+\[ z = \frac{61.8 - 60}{4.9/\sqrt{100}} = \frac{1.8}{0.49} \approx 3.67. \]
+\item \textbf{Comparison and decision:} $z = 3.67 > 1.645$ falls in the critical region, so we reject $H_0$.
+\item \textbf{Comment:} The mean life span today is greater than $60$ years.
 \end{enumerate}
 \ans{$z = 3.67 > 1.645$; reject $H_0$. The data indicate that the mean life span today is greater than $60\text{ years}$.}
 \end{solution}
@@ -2192,10 +2211,13 @@ The mean weekly sale of a chocolate bar company in candy stores was 153.7 bars p
 \begin{solution}
 Given $\mu_0 = 153.7$, $n = 29$, $\bar{x} = 169.4$, $s = 19.7$, $\nu = n - 1 = 28$, and $\alpha = 0.05$:
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 153.7$ vs.\ $H_1: \mu > 153.7$ (right-tailed $t$-test).
-\item \textbf{Test Statistic:}
-\[ t = \frac{\bar{x} - \mu_0}{s/\sqrt{n}} = \frac{169.4 - 153.7}{19.7/\sqrt{29}} = \frac{15.7}{3.6582} \approx 4.292. \]
-\item \textbf{Decision:} From Chart 2 (for $\nu = 28$), $t_{0.05, 28} = 1.701$ (one-tailed) and $t_{0.025, 28} = 2.048$ (two-tailed). Since $t = 4.292 > 1.701$, we reject $H_0$.
+\item \textbf{Hypothesis:} $H_0: \mu = 153.7$ against $H_1: \mu > 153.7$ (right-tailed; $\sigma$ unknown, small sample $n = 29 < 30$ $\Rightarrow$ $t$-test).
+\item \textbf{Level of significance:} $\alpha = 0.05$; from the $t$-table, $t_{\alpha,n-1} = t_{0.05,28} = 1.701$. Critical region: $t > 1.701$.
+\item \textbf{Test statistic:} $t = \dfrac{\bar{x} - \mu_0}{s/\sqrt{n}} \sim t_{n-1}$.
+\item \textbf{Calculated value:}
+\[ t = \frac{169.4 - 153.7}{19.7/\sqrt{29}} = \frac{15.7}{3.6582} \approx 4.292. \]
+\item \textbf{Comparison and decision:} $t = 4.292 > 1.701$ falls in the critical region, so we reject $H_0$.
+\item \textbf{Comment:} The mean weekly sale has increased; the advertising was successful.
 \end{enumerate}
 \ans{$t = 4.292 > 1.701$; reject $H_0$. The advertising campaign was successful in increasing sales.}
 \end{solution}
@@ -2205,14 +2227,18 @@ Given $\mu_0 = 153.7$, $n = 29$, $\bar{x} = 169.4$, $s = 19.7$, $\nu = n - 1 = 2
 A bulb manufacturing company claims that the average longevity of their bulb is 4 years with a standard deviation 0.16 years. A random sample of 10 bulbs gave mean longevity of 3.45 years. Does the sample mean justify the claim of the manufacturer? Use a 5 percent level of significance. (Necessary Chart 1 is attached)
 \end{question}
 \begin{solution}
-Given $\mu_0 = 4\text{ years}$, $\sigma = 0.16\text{ years}$ (or sample $s = 0.16$), $n = 10$, $\bar{x} = 3.45\text{ years}$, and $\alpha = 0.05$ (Chart 1 is Student's $t$-table with $\nu = 9$, where $t_{0.025, 9} = 2.26$ and $t_{0.05, 9} = 1.83$):
+The standard deviation $\sigma = 0.16$ is part of the manufacturer's claim, i.e.\ the population $\sigma$ is known, so the normal ($z$) test is used even though $n = 10$ is small (slides: ``$\sigma$ is assumed to be known or estimated from a large sample''). Given $\mu_0 = 4$, $n = 10$, $\bar{x} = 3.45$.
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 4.0\text{ years}$ vs.\ $H_1: \mu \neq 4.0\text{ years}$ (or $H_1: \mu < 4.0$).
-\item \textbf{Test Statistic:}
-\[ t = \frac{\bar{x} - \mu_0}{\sigma/\sqrt{n}} = \frac{3.45 - 4.00}{0.16/\sqrt{10}} = \frac{-0.55}{0.05060} \approx -10.870. \]
-\item \textbf{Decision:} Since $|t| = 10.870 \gg t_{0.025, 9} = 2.26$ (and also $\gg z_{0.025} = 1.96$ if $0.16$ is treated as the known population $\sigma$), we strongly reject $H_0$.
+\item \textbf{Hypothesis:} $H_0: \mu = 4$ against $H_1: \mu \neq 4$ (two-tailed test).
+\item \textbf{Level of significance:} $\alpha = 0.05$; critical values $z_{\alpha/2} = z_{0.025} = -1.96$ and $z_{1-\alpha/2} = z_{0.975} = 1.96$.
+\item \textbf{Critical region:} $z < -1.96$ or $z > 1.96$.
+\item \textbf{Test statistic:} $z = \dfrac{\bar{x} - \mu_0}{\sigma/\sqrt{n}} \sim N(0,1)$.
+\item \textbf{Calculated value:}
+\[ z = \frac{3.45 - 4}{0.16/\sqrt{10}} = \frac{-0.55}{0.05060} \approx -10.87. \]
+\item \textbf{Comparison and decision:} $z = -10.87 < -1.96$ falls in the critical region, so we reject $H_0$ at the $5\%$ level. (Even if $0.16$ were treated as a sample $s$ and the $t$-table used, $|t| = 10.87 > t_{0.025,9} = 2.262$; same decision.)
+\item \textbf{Comment:} The claim of the manufacturer is false; the mean longevity of the bulbs is not $4$ years.
 \end{enumerate}
-\ans{$t = -10.87$; reject $H_0$. The sample mean of $3.45\text{ years}$ does not justify the manufacturer's claim.}
+\ans{$z = -10.87 < -1.96$; reject $H_0$. The sample mean of $3.45\text{ years}$ does not justify the manufacturer's claim.}
 \end{solution}
 
 %---------------------------------------------------------------- P068
@@ -2223,14 +2249,16 @@ Test whether the average packing can be taken to be 0.5 lbs at 5\% level of sign
 \end{question}
 \begin{solution}
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 0.50\text{ lbs}$ vs.\ $H_1: \mu \neq 0.50\text{ lbs}$ ($\alpha = 0.05$, $\nu = n - 1 = 10$, critical value $t_{0.025, 10} = \pm 2.23$).
+\item \textbf{Hypothesis:} $H_0: \mu = 0.50$ against $H_1: \mu \neq 0.50$ ($\sigma$ unknown, small sample $\Rightarrow$ $t$-test, $\nu = n - 1 = 10$).
+\item \textbf{Level of significance:} $\alpha = 0.05$; critical values $\pm t_{\alpha/2,n-1} = \pm t_{0.025,10} = \pm 2.23$. Critical region: $t < -2.23$ or $t > 2.23$.
 \item \textbf{Sample Mean and Standard Deviation ($n = 11$):}
 \[ \bar{x} = \frac{\sum_{i=1}^{11} x_i}{11} = \frac{5.19}{11} \approx 0.47182\text{ lbs}. \]
-Computing $\sum (x_i - \bar{x})^2 = \sum x_i^2 - \frac{(\sum x_i)^2}{11} = 2.4555 - \frac{26.9361}{11} = 2.4555 - 2.448736 = 0.006764$:
-\[ s = \sqrt{\frac{0.006764}{10}} \approx 0.02601\text{ lbs}. \]
-\item \textbf{Test Statistic \& Decision:}
+With $\sum x_i^2 = 2.4555$:
+\[ \begin{aligned} s^2 &= \frac{1}{n-1}\left[\sum x_i^2 - n\bar{x}^2\right] = \frac{1}{10}\left[2.4555 - \frac{5.19^2}{11}\right] \\ &= \frac{2.4555 - 2.448736}{10} = \frac{0.006764}{10} \implies s \approx 0.02601\text{ lbs}. \end{aligned} \]
+\item \textbf{Test statistic and calculated value:}
 \[ t = \frac{\bar{x} - \mu_0}{s/\sqrt{n}} = \frac{0.47182 - 0.50}{0.02601/\sqrt{11}} = \frac{-0.02818}{0.007842} \approx -3.594. \]
-Since $|t| = 3.594 > 2.23$, we reject $H_0$.
+\item \textbf{Comparison and decision:} $t = -3.594 < -2.23$ falls in the critical region, so we reject $H_0$.
+\item \textbf{Comment:} The average packing is not $0.5$ lbs.
 \end{enumerate}
 \ans{$t = -3.594$ ($|t| > 2.23$); reject $H_0$. The average packing weight cannot be taken to be $0.5\text{ lbs}$.}
 \end{solution}
@@ -2262,7 +2290,9 @@ A survey of 640 families with 5 children each revealed the following distributio
 Is this result consistent with the hypothesis that male and female births are equally probable? (use a 5\% level of significance, given that for $v = 5, \chi^2_{0.05} = 11.07$)
 \end{question}
 \begin{solution}
-Under $H_0: p = q = \dfrac{1}{2}$ (male and female births are equally likely), the probability of having $x$ boys in a family of 5 children is $P(X = x) = \binom{5}{x}\left(\frac{1}{2}\right)^5 = \dfrac{\binom{5}{x}}{32}$ for $x = 5, 4, 3, 2, 1, 0$, giving theoretical proportions $\dfrac{1}{32}, \dfrac{5}{32}, \dfrac{10}{32}, \dfrac{10}{32}, \dfrac{5}{32}, \dfrac{1}{32}$.
+\textbf{Hypothesis:} $H_0$: male and female births are equally probable ($p = q = \frac12$) against $H_1$: they are not equally probable. \textbf{Level of significance:} $\alpha = 0.05$. \textbf{Test statistic:} $\chi^2 = \sum_{i=1}^{6}\frac{(O_i - E_i)^2}{E_i} \sim \chi^2$ with $\nu = 6 - 1 = 5$ d.f.; one-tailed (upper) test with critical value $\chi^2_{0.05,5} = 11.07$, critical region $\chi^2 \ge 11.07$.
+
+Under $H_0$, the probability of having $x$ boys in a family of 5 children is $P(X = x) = \binom{5}{x}\left(\frac{1}{2}\right)^5 = \dfrac{\binom{5}{x}}{32}$ for $x = 5, 4, 3, 2, 1, 0$, giving theoretical proportions $\dfrac{1}{32}, \dfrac{5}{32}, \dfrac{10}{32}, \dfrac{10}{32}, \dfrac{5}{32}, \dfrac{1}{32}$.
 
 \begin{center}\small
 \begin{tabular}{@{}ccccccc@{}}
@@ -2291,13 +2321,15 @@ $(O_i - E_i)^2 / E_i$ & $3.20$ & $1.44$ & $2.00$ & $2.88$ & $4.00$ & $0.80$ \\
 In a survey of buying habits, 500 women shoppers are chosen at random in supermarket A; their average weekly food expenditure is Tk. 500 with a standard deviation of Tk. 80. For another group of 500 women shoppers chosen at random in supermarket B located in another area of the same city, the average weekly food expenditure is Tk. 440 with a standard deviation of Tk. 90. Test at 10\% level of significance whether the average weekly food expenditures of the populations of women shoppers are equal.
 \end{question}
 \begin{solution}
-Given $n_1 = 500,\ \bar{x}_1 = 500,\ s_1 = 80$ and $n_2 = 500,\ \bar{x}_2 = 440,\ s_2 = 90$, with $\alpha = 0.10$:
+Given $n_1 = 500,\ \bar{x}_1 = 500,\ s_1 = 80$ and $n_2 = 500,\ \bar{x}_2 = 440,\ s_2 = 90$. Population variances are unknown (and not assumed equal) and both samples are large, so the slides' large-sample $z$-test with $V(\bar{x}_1 - \bar{x}_2) = \frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}$ is used.
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu_1 = \mu_2$ vs.\ $H_1: \mu_1 \neq \mu_2$ (two-tailed large-sample $z$-test).
-\item \textbf{Standard Error and Test Statistic:}
-\[ \text{SE} = \sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}} = \sqrt{\frac{80^2}{500} + \frac{90^2}{500}} = \sqrt{\frac{6400 + 8100}{500}} = \sqrt{29} \approx 5.3852, \]
-\[ z = \frac{\bar{x}_1 - \bar{x}_2}{\text{SE}} = \frac{500 - 440}{5.3852} = \frac{60}{5.3852} \approx 11.142. \]
-\item \textbf{Decision:} At $\alpha = 0.10$ (two-tailed), the critical value is $z_{0.05} = \pm 1.645$. Since $z = 11.142 \gg 1.645$, we reject $H_0$.
+\item \textbf{Hypothesis:} $H_0: \mu_1 = \mu_2$ against $H_1: \mu_1 \neq \mu_2$ (two-tailed test).
+\item \textbf{Level of significance:} $\alpha = 0.10$; critical values $z_{\alpha/2} = z_{0.05} = -1.645$ and $z_{1-\alpha/2} = z_{0.95} = 1.645$. Critical region: $z < -1.645$ or $z > 1.645$.
+\item \textbf{Test statistic:} $z = \dfrac{\bar{x}_1 - \bar{x}_2}{\sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}} \sim N(0,1)$.
+\item \textbf{Calculated value:}
+\[ \sqrt{\frac{80^2}{500} + \frac{90^2}{500}} = \sqrt{\frac{6400 + 8100}{500}} = \sqrt{29} \approx 5.3852, \qquad z = \frac{500 - 440}{5.3852} \approx 11.142. \]
+\item \textbf{Comparison and decision:} $z = 11.142 > 1.645$ falls in the critical region, so we reject $H_0$.
+\item \textbf{Comment:} The average weekly food expenditures of the two populations of women shoppers are not equal.
 \end{enumerate}
 \ans{$z = 11.14 > 1.645$; reject $H_0$. The population average weekly food expenditures differ significantly.}
 \end{solution}
@@ -2321,14 +2353,16 @@ The printed critical value $3.355$ is actually $t_{0.005,8}$ (two-tailed $1\%$ l
 \medskip
 \textbf{Part 2: One-Sample $t$-Test ($n = 9,\ \mu_0 = 47,\ \nu = 8$).}
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu = 47$ vs.\ $H_1: \mu \neq 47$.
+\item \textbf{Hypothesis:} $H_0: \mu = 47$ against $H_1: \mu \neq 47$ ($\sigma$ unknown, small sample $\Rightarrow$ $t$-test).
+\item \textbf{Level of significance:} $\alpha = 0.05$; critical values (as given) $\pm 3.355$. Critical region: $t < -3.355$ or $t > 3.355$.
 \item \textbf{Sample Mean and Standard Deviation:}
 \[ \bar{x} = \frac{50 + 48 + 49 + 53 + 52 + 47 + 45 + 46 + 51}{9} = \frac{441}{9} = 49.0. \]
 Deviations $x_i - \bar{x}$ are $1, -1, 0, 4, 3, -2, -4, -3, 2$, so $\sum (x_i - \bar{x})^2 = 1 + 1 + 0 + 16 + 9 + 4 + 16 + 9 + 4 = 60$:
 \[ s = \sqrt{\frac{60}{9 - 1}} = \sqrt{7.5} \approx 2.7386. \]
-\item \textbf{Test Statistic \& Decision:}
+\item \textbf{Test statistic and calculated value:}
 \[ t = \frac{\bar{x} - \mu_0}{s/\sqrt{n}} = \frac{49.0 - 47.0}{2.7386/\sqrt{9}} = \frac{2.0}{0.91287} \approx 2.1909. \]
-Since $|t| = 2.191 < 3.355$ (and also less than the standard $5\%$ two-tailed critical value $t_{0.025, 8} = 2.306$), we fail to reject $H_0$.
+\item \textbf{Comparison and decision:} $-3.355 < t = 2.191 < 3.355$ (also $< t_{0.025,8} = 2.306$) falls in the acceptance region; we fail to reject $H_0$.
+\item \textbf{Comment:} The sample can be regarded as drawn from a population with mean $47$.
 \end{enumerate}
 \ans{$t = 2.191 < 3.355$; fail to reject $H_0$. The sample can be regarded as taken from a population with mean $47$.}
 \end{solution}
@@ -2348,7 +2382,8 @@ Test the hypothesis that the coins are unbiased at 5\% level of significance. (G
 \end{question}
 \begin{solution}
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0$: The 5 coins are unbiased ($p = \frac{1}{2}$) vs.\ $H_1$: The coins are biased.
+\item \textbf{Hypothesis:} $H_0$: The 5 coins are unbiased ($p = \frac{1}{2}$) against $H_1$: The coins are biased.
+\item \textbf{Level of significance:} $\alpha = 0.05$. Test statistic $\chi^2 = \sum \frac{(O_x - E_x)^2}{E_x} \sim \chi^2$ with $\nu = 6 - 1 = 5$ d.f.; one-tailed (upper) critical value $\chi^2_{0.05,5} = 11.07$.
 \item \textbf{Expected Frequencies ($E_x = 3200\binom{5}{x}\left(\frac{1}{2}\right)^5 = 100\binom{5}{x}$):}
 \begin{center}\small
 \begin{tabular}{@{}lcccccc@{}}
@@ -2361,7 +2396,7 @@ $(O_x - E_x)^2 / E_x$ & $4.00$ & $9.80$ & $10.00$ & $10.00$ & $0.00$ & $25.00$ \
 \bottomrule
 \end{tabular}
 \end{center}
-\item \textbf{Chi-Square Statistic \& Decision:}
+\item \textbf{Calculated value \& decision:}
 \[ \chi^2 = \sum_{x=0}^{5} \frac{(O_x - E_x)^2}{E_x} = 4.00 + 9.80 + 10.00 + 10.00 + 0.00 + 25.00 = 58.80. \]
 Since $\chi^2 = 58.80 > \chi^2_{0.05, 5} = 11.07$, we reject $H_0$.
 \end{enumerate}
@@ -2369,7 +2404,7 @@ Since $\chi^2 = 58.80 > \chi^2_{0.05, 5} = 11.07$, we reject $H_0$.
 \end{solution}
 
 %===================================================================== TOPIC 11
-\topic[Analysis of Variance]{11}{Analysis of Variance (One-Way \& Two-Way ANOVA)}
+\topic[Analysis of Variance]{11}{Analysis of Variance (One-Way ANOVA)}
 
 %---------------------------------------------------------------- P074
 \begin{question}{2023--2024 \textbullet\ Q8(b)}{MATH 243 \textbullet\ 21/05/2026 \textbullet\ P074}{20}
@@ -2389,36 +2424,37 @@ C & 19 & 16 & 22 & 31 \\
 \begin{solution}
 We have $k = 3$ cities (treatments), each with $n_i = 4$ observations ($N = 12$ total).
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu_A = \mu_B = \mu_C$ vs.\ $H_1$: At least two city mean prices differ.
-\item \textbf{Group Means and Grand Mean:}
+\item \textbf{Hypotheses:} $H_0: \mu_A = \mu_B = \mu_C$ vs.\ $H_1$: At least two city mean prices are unequal.
+\item \textbf{Totals and Means:}
 \begin{itemize}
-\item City A: $T_A = 15 + 18 + 23 + 24 = 80 \implies \bar{x}_A = \dfrac{80}{4} = 20.0$.
-\item City B: $T_B = 23 + 19 + 18 + 24 = 84 \implies \bar{x}_B = \dfrac{84}{4} = 21.0$.
-\item City C: $T_C = 19 + 16 + 22 + 31 = 88 \implies \bar{x}_C = \dfrac{88}{4} = 22.0$.
-\item Grand Total $G = 80 + 84 + 88 = 252 \implies \text{Grand Mean } \bar{\bar{x}} = \dfrac{252}{12} = 21.0$.
+\item City A: $T_1 = 15 + 18 + 23 + 24 = 80$, \quad $\bar{x}_1 = 20$.
+\item City B: $T_2 = 23 + 19 + 18 + 24 = 84$, \quad $\bar{x}_2 = 21$.
+\item City C: $T_3 = 19 + 16 + 22 + 31 = 88$, \quad $\bar{x}_3 = 22$.
+\item Grand total $G = T_1 + T_2 + T_3 = 252$, \quad $N = n_1 + n_2 + n_3 = 12$.
 \end{itemize}
-\item \textbf{Sums of Squares ($SST, SSB, SSW$):}
-\begin{align*}
-SSB &= \sum_{i=1}^{3} n_i(\bar{x}_i - \bar{\bar{x}})^2 = 4\big[(20 - 21)^2 + (21 - 21)^2 + (22 - 21)^2\big] = 4(1 + 0 + 1) = 8.0, \\[4pt]
-SSW &= \sum_{i=1}^{3}\sum_{j=1}^{4} (x_{ij} - \bar{x}_i)^2 \\
-    &= \big[(-5)^2 + (-2)^2 + 3^2 + 4^2\big] + \big[2^2 + (-2)^2 + (-3)^2 + 3^2\big] + \big[(-3)^2 + (-6)^2 + 0^2 + 9^2\big] \\
-    &= 54 + 26 + 126 = 206.0, \\[4pt]
-SST &= SSB + SSW = 8.0 + 206.0 = 214.0.
-\end{align*}
-\item \textbf{One-Way ANOVA Table:}
+\item \textbf{Correction Term:}
+\[ CT = \frac{G^2}{N} = \frac{252^2}{12} = \frac{63504}{12} = 5292. \]
+\item \textbf{Between-Sample Variation:}
+\[ S_B = \sum_{i=1}^{k}\frac{T_i^2}{n_i} - CT = \frac{80^2}{4} + \frac{84^2}{4} + \frac{88^2}{4} - 5292 = 1600 + 1764 + 1936 - 5292 = 8. \]
+\item \textbf{Total Variation:}
+\[ \sum_i\sum_j x_{ij}^2 = 15^2 + 18^2 + \cdots + 31^2 = 1654 + 1790 + 2062 = 5506, \]
+\[ S_T = \sum_i\sum_j x_{ij}^2 - CT = 5506 - 5292 = 214. \]
+\item \textbf{Within-Sample Variation:} $S_W = S_T - S_B = 214 - 8 = 206$.
+\item \textbf{Test Statistic:}
+\[ F = \frac{S_B/(k-1)}{S_W/(N-k)} = \frac{8/2}{206/9} = \frac{4}{22.89} = 0.1748 \sim F_{(2,9)}. \]
+\item \textbf{ANOVA Table:}
 \begin{center}\small
 \begin{tabular}{@{}lcccc@{}}
 \toprule
-\textbf{Source} & \textbf{SS} & \textbf{df ($\nu$)} & \textbf{MS} & \textbf{$F$-Ratio} \\
+\textbf{Source} & \textbf{SS} & \textbf{df} & \textbf{MS} & \textbf{$F$} \\
 \midrule
-Between Cities & $SSB = 8.0$ & $k - 1 = 2$ & $MSB = 8.0/2 = 4.000$ & $F = \dfrac{4.000}{22.889} = 0.1748$ \\
-Within Cities (Error) & $SSW = 206.0$ & $N - k = 9$ & $MSW = 206.0/9 = 22.889$ & \\
-\midrule
-\textbf{Total} & $SST = 214.0$ & $N - 1 = 11$ & & \\
+Between & $8$ & $k - 1 = 2$ & $4.00$ & $0.1748$ \\
+Within & $206$ & $N - k = 9$ & $22.89$ & \\
+Total & $214$ & $N - 1 = 11$ & & \\
 \bottomrule
 \end{tabular}
 \end{center}
-\item \textbf{Decision:} Since $F = 0.1748 < F_{0.05(2,9)} = 4.26$, we fail to reject $H_0$.
+\item \textbf{Decision:} Critical value at $\alpha = 0.05$: $F_{0.05,(2,9)} = 4.26$. Since $F_{\text{cal}} = 0.1748 < 4.26$, we cannot reject $H_0$.
 \end{enumerate}
 \ans{$F = 0.1748 < 4.26$; fail to reject $H_0$. There is no significant difference in commodity prices across the three cities.}
 \end{solution}
@@ -2441,96 +2477,41 @@ Suppose you test the lifetime of three electric bulbs of each of four brands (me
 \begin{solution}
 Here $k = 4$ brands, $n_i = 3$ bulbs per brand, and $N = 12$ bulbs total.
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu_A = \mu_B = \mu_C = \mu_D$ vs.\ $H_1$: Not all brand means are equal.
-\item \textbf{Brand Means and Grand Mean:}
+\item \textbf{Hypotheses:} $H_0: \mu_A = \mu_B = \mu_C = \mu_D$ vs.\ $H_1$: At least two brand means are unequal.
+\item \textbf{Totals and Means:}
 \begin{itemize}
-\item $\bar{x}_A = \dfrac{20+19+21}{3} = 20.0$, \quad $\bar{x}_B = \dfrac{25+23+21}{3} = 23.0$, \quad $\bar{x}_C = \dfrac{24+20+22}{3} = 22.0$, \quad $\bar{x}_D = \dfrac{23+20+20}{3} = 21.0$.
-\item Grand Mean: $\bar{\bar{x}} = \dfrac{20 + 23 + 22 + 21}{4} = 21.5$.
+\item $T_1 = 20+19+21 = 60,\ \bar{x}_1 = 20$; \quad $T_2 = 25+23+21 = 69,\ \bar{x}_2 = 23$;
+\item $T_3 = 24+20+22 = 66,\ \bar{x}_3 = 22$; \quad $T_4 = 23+20+20 = 63,\ \bar{x}_4 = 21$.
+\item Grand total $G = 60 + 69 + 66 + 63 = 258$, \quad $N = 12$.
 \end{itemize}
-\item \textbf{Sums of Squares:}
-\begin{align*}
-SSB &= 3\big[(-1.5)^2 + (1.5)^2 + (0.5)^2 + (-0.5)^2\big] = 3(2.25 + 2.25 + 0.25 + 0.25) = 15.0, \\[4pt]
-SSW &= (0+1+1) + (4+0+4) + (4+4+0) + (4+1+1) = 2 + 8 + 8 + 6 = 24.0, \\[4pt]
-SST &= 15.0 + 24.0 = 39.0.
-\end{align*}
-\item \textbf{One-Way ANOVA Table ($\nu_1 = 3,\ \nu_2 = 8$):}
+\item \textbf{Correction Term:}
+\[ CT = \frac{G^2}{N} = \frac{258^2}{12} = \frac{66564}{12} = 5547. \]
+\item \textbf{Between-Sample Variation:}
+\[ S_B = \sum_{i=1}^{k}\frac{T_i^2}{n_i} - CT = \frac{60^2 + 69^2 + 66^2 + 63^2}{3} - 5547 = \frac{16686}{3} - 5547 = 5562 - 5547 = 15. \]
+\item \textbf{Total Variation:}
+\[ \sum_i\sum_j x_{ij}^2 = 20^2 + 19^2 + \cdots + 20^2 = 1202 + 1595 + 1460 + 1329 = 5586, \qquad S_T = 5586 - 5547 = 39. \]
+\item \textbf{Within-Sample Variation:} $S_W = S_T - S_B = 39 - 15 = 24$.
+\item \textbf{Test Statistic:}
+\[ F = \frac{S_B/(k-1)}{S_W/(N-k)} = \frac{15/3}{24/8} = \frac{5}{3} = 1.667 \sim F_{(3,8)}. \]
+\item \textbf{ANOVA Table:}
 \begin{center}\small
 \begin{tabular}{@{}lcccc@{}}
 \toprule
-\textbf{Source} & \textbf{SS} & \textbf{df} & \textbf{MS} & \textbf{$F$-Ratio} \\
+\textbf{Source} & \textbf{SS} & \textbf{df} & \textbf{MS} & \textbf{$F$} \\
 \midrule
-Between Brands & $15.0$ & $3$ & $MSB = 5.0$ & $F = \dfrac{5.0}{3.0} = 1.6667$ \\
-Within Brands (Error) & $24.0$ & $8$ & $MSW = 3.0$ & \\
-\midrule
-\textbf{Total} & $39.0$ & $11$ & & \\
+Between & $15$ & $k - 1 = 3$ & $5$ & $1.667$ \\
+Within & $24$ & $N - k = 8$ & $3$ & \\
+Total & $39$ & $N - 1 = 11$ & & \\
 \bottomrule
 \end{tabular}
 \end{center}
-\item \textbf{Decision:} From the attached $F$-tables for $(\nu_1 = 3, \nu_2 = 8)$, $F_{0.05(3,8)} = 4.07$ and $F_{0.01(3,8)} = 7.59$. Since $F = 1.67 < 4.07 < 7.59$, we fail to reject $H_0$ at both the $5\%$ and $1\%$ levels.
+\item \textbf{Decision:} From the $F$-table, $F_{0.05,(3,8)} = 4.07$ and $F_{0.01,(3,8)} = 7.59$. Since $F_{\text{cal}} = 1.667 < 4.07$ and $1.667 < 7.59$, we cannot reject $H_0$ at either the $5\%$ or the $1\%$ level.
 \end{enumerate}
 \ans{$F = 1.67$ (critical values: $F_{0.05(3,8)} = 4.07$, $F_{0.01(3,8)} = 7.59$); fail to reject $H_0$ at both $5\%$ and $1\%$ significance levels.}
 \end{solution}
 
 %---------------------------------------------------------------- P076
-\begin{question}{2022--2023 \textbullet\ Q8(c)}{MATH 243 \textbullet\ 01/02/2025 \textbullet\ P076}{15}
-Seeds of four different types of corn are planted in five blocks. Each block is divided into four plots, which are then randomly assigned to the four types of corn. Determine at the 0.05 significance level whether the yields in bushels per acre, as shown in the following Table, vary significantly with differences in (i) the soil (i.e., the five blocks) and (ii) the type of corn. (Necessary charts are attached).
-\begin{center}\small
-\begin{tabular}{@{}lcccc@{}}
-\toprule
-& \textbf{Type I} & \textbf{Type II} & \textbf{Type III} & \textbf{Type IV} \\
-\midrule
-Block A & 12 & 15 & 10 & 14 \\
-Block B & 15 & 19 & 12 & 11 \\
-Block C & 14 & 18 & 15 & 12 \\
-Block D & 11 & 16 & 12 & 16 \\
-Block E & 16 & 17 & 11 & 14 \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{question}
-\begin{solution}
-This is a Randomized Complete Block Design (two-way ANOVA without interaction) with $b = 5$ blocks (rows) and $k = 4$ corn types (columns), giving $N = bk = 20$ observations.
-\begin{enumerate}[1.]
-\item \textbf{Row (Block) Means, Column (Treatment) Means, and Grand Mean:}
-\begin{itemize}
-\item \textbf{Block Totals ($R_i$) \& Means ($\bar{x}_{i\cdot} = R_i/4$):}
-Block A: $51\ (12.75)$;\quad Block B: $57\ (14.25)$;\quad Block C: $59\ (14.75)$;\quad Block D: $55\ (13.75)$;\quad Block E: $58\ (14.50)$.
-\item \textbf{Corn Type Totals ($C_j$) \& Means ($\bar{x}_{\cdot j} = C_j/5$):}
-Type I: $68\ (13.60)$;\quad Type II: $85\ (17.00)$;\quad Type III: $60\ (12.00)$;\quad Type IV: $67\ (13.40)$.
-\item \textbf{Grand Total \& Grand Mean:} $G = 280 \implies \bar{\bar{x}} = \dfrac{280}{20} = 14.0$.
-\end{itemize}
-\item \textbf{Sums of Squares:}
-\begin{align*}
-SST &= \sum_{i=1}^{5}\sum_{j=1}^{4} (x_{ij} - 14.0)^2 = \sum x_{ij}^2 - \frac{G^2}{20} = 4044 - \frac{280^2}{20} = 4044 - 3920 = 124.0, \\[4pt]
-SS_{\text{Blocks}} &= 4\sum_{i=1}^{5} (\bar{x}_{i\cdot} - 14.0)^2 = \frac{51^2 + 57^2 + 59^2 + 55^2 + 58^2}{4} - 3920 = 3930 - 3920 = 10.0, \\[4pt]
-SS_{\text{Corn}} &= 5\sum_{j=1}^{4} (\bar{x}_{\cdot j} - 14.0)^2 = \frac{68^2 + 85^2 + 60^2 + 67^2}{5} - 3920 = 3987.6 - 3920 = 67.6, \\[4pt]
-SSE &= SST - SS_{\text{Blocks}} - SS_{\text{Corn}} = 124.0 - 10.0 - 67.6 = 46.4.
-\end{align*}
-\item \textbf{Two-Way ANOVA Table:}
-\begin{center}\small
-\begin{tabular}{@{}lccccc@{}}
-\toprule
-\textbf{Source of Variation} & \textbf{SS} & \textbf{df} & \textbf{MS} & \textbf{$F$-Ratio} & \textbf{Critical $F_{0.05}$} \\
-\midrule
-Blocks (Soil) & $10.0$ & $b - 1 = 4$ & $2.5000$ & $F_B = \dfrac{2.5000}{3.8667} = 0.6466$ & $F_{0.05(4,12)} = 3.26$ \\
-Corn Types & $67.6$ & $k - 1 = 3$ & $22.5333$ & $F_C = \dfrac{22.5333}{3.8667} = 5.8276$ & $F_{0.05(3,12)} = 3.49$ \\
-Error (Residual) & $46.4$ & $(b-1)(k-1) = 12$ & $3.8667$ & & \\
-\midrule
-\textbf{Total} & $124.0$ & $N - 1 = 19$ & & & \\
-\bottomrule
-\end{tabular}
-\end{center}
-\item \textbf{Conclusions at $\alpha = 0.05$:}
-\begin{enumerate}[(i)]
-\item \textbf{Soil (Blocks):} Since $F_B = 0.65 < F_{0.05(4,12)} = 3.26$, fail to reject $H_{0B}$ (yields do not vary significantly across soil blocks).
-\item \textbf{Type of Corn:} Since $F_C = 5.83 > F_{0.05(3,12)} = 3.49$, reject $H_{0C}$ (yields vary significantly among the four types of corn).
-\end{enumerate}
-\end{enumerate}
-\ans{(i) Soil blocks: $F = 0.65 < 3.26$ (not significant); \qquad (ii) Corn types: $F = 5.83 > 3.49$ (significant difference at $\alpha = 0.05$).}
-\end{solution}
-
-%---------------------------------------------------------------- P077
-\begin{question}{2021--2022 \textbullet\ Q8(b)}{MATH 245 \textbullet\ 30/04/2023 \textbullet\ P077}{18}
+\begin{question}{2021--2022 \textbullet\ Q8(b)}{MATH 245 \textbullet\ 30/04/2023 \textbullet\ P076}{18}
 A merchandising company wishes to test whether its 3 salesmen A, B, and C tend to make sales of the same size or whether they differ in selling ability as measured by the average size of their sales. During the last week, out of 14 sales, A made 5, B made 4, and C made 5 calls. The following are the weekly sales (in Tk thousand) record of 3 salesmen:
 \begin{center}\small
 \begin{tabular}{@{}lccccc@{}}
@@ -2548,36 +2529,37 @@ Test whether the three salesmen's average sales differ in size. (Given that $F_{
 \begin{solution}
 Here $k = 3$ salesmen with unequal sample sizes $n_A = 5,\ n_B = 4,\ n_C = 5$ ($N = 14$ total calls).
 \begin{enumerate}[1.]
-\item \textbf{Hypotheses:} $H_0: \mu_A = \mu_B = \mu_C$ vs.\ $H_1$: At least two salesmen differ in mean sales.
-\item \textbf{Group Means and Grand Mean:}
+\item \textbf{Hypotheses:} $H_0: \mu_A = \mu_B = \mu_C$ vs.\ $H_1$: At least two salesmen's mean sales are unequal.
+\item \textbf{Totals and Means:}
 \begin{itemize}
-\item Salesman A: $T_A = 1500 \implies \bar{x}_A = \dfrac{1500}{5} = 300$.
-\item Salesman B: $T_B = 1600 \implies \bar{x}_B = \dfrac{1600}{4} = 400$.
-\item Salesman C: $T_C = 2500 \implies \bar{x}_C = \dfrac{2500}{5} = 500$.
-\item Grand Total $G = 1500 + 1600 + 2500 = 5600 \implies \text{Grand Mean } \bar{\bar{x}} = \dfrac{5600}{14} = 400$.
+\item Salesman A: $T_1 = 300 + 400 + 300 + 500 + 0 = 1500$, \quad $\bar{x}_1 = 1500/5 = 300$.
+\item Salesman B: $T_2 = 600 + 300 + 300 + 400 = 1600$, \quad $\bar{x}_2 = 1600/4 = 400$.
+\item Salesman C: $T_3 = 700 + 300 + 400 + 600 + 500 = 2500$, \quad $\bar{x}_3 = 2500/5 = 500$.
+\item Grand total $G = 1500 + 1600 + 2500 = 5600$, \quad $N = 5 + 4 + 5 = 14$.
 \end{itemize}
-\item \textbf{Sums of Squares:}
-\begin{align*}
-SSB &= 5(-100)^2 + 4(0)^2 + 5(100)^2 = 50{,}000 + 0 + 50{,}000 = 100{,}000, \\[4pt]
-SSW &= \sum_{j}(x_{Aj} - 300)^2 + \sum_{j}(x_{Bj} - 400)^2 + \sum_{j}(x_{Cj} - 500)^2 \\
-    &= (100^2 + 200^2 + 300^2) + (200^2 + 100^2 + 100^2) + (200^2 + 200^2 + 100^2 + 100^2) \\
-    &= 140{,}000 + 60{,}000 + 100{,}000 = 300{,}000, \\[4pt]
-SST &= 100{,}000 + 300{,}000 = 400{,}000.
-\end{align*}
-\item \textbf{One-Way ANOVA Table ($\nu_1 = 2,\ \nu_2 = 11$):}
+\item \textbf{Correction Term:}
+\[ CT = \frac{G^2}{N} = \frac{5600^2}{14} = \frac{31{,}360{,}000}{14} = 2{,}240{,}000. \]
+\item \textbf{Between-Sample Variation:}
+\[ S_B = \sum_{i=1}^{k}\frac{T_i^2}{n_i} - CT = \frac{1500^2}{5} + \frac{1600^2}{4} + \frac{2500^2}{5} - CT \]
+\[ = 450{,}000 + 640{,}000 + 1{,}250{,}000 - 2{,}240{,}000 = 100{,}000. \]
+\item \textbf{Total Variation:}
+\[ \sum_i\sum_j x_{ij}^2 = \underbrace{590{,}000}_{A} + \underbrace{700{,}000}_{B} + \underbrace{1{,}350{,}000}_{C} = 2{,}640{,}000, \qquad S_T = 2{,}640{,}000 - 2{,}240{,}000 = 400{,}000. \]
+\item \textbf{Within-Sample Variation:} $S_W = S_T - S_B = 400{,}000 - 100{,}000 = 300{,}000$.
+\item \textbf{Test Statistic:}
+\[ F = \frac{S_B/(k-1)}{S_W/(N-k)} = \frac{100{,}000/2}{300{,}000/11} = \frac{50{,}000}{27{,}272.73} = 1.833 \sim F_{(2,11)}. \]
+\item \textbf{ANOVA Table:}
 \begin{center}\small
 \begin{tabular}{@{}lcccc@{}}
 \toprule
-\textbf{Source} & \textbf{SS} & \textbf{df} & \textbf{MS} & \textbf{$F$-Ratio} \\
+\textbf{Source} & \textbf{SS} & \textbf{df} & \textbf{MS} & \textbf{$F$} \\
 \midrule
-Between Salesmen & $100{,}000$ & $2$ & $MSB = 50{,}000.0$ & $F = \dfrac{50{,}000}{27{,}272.73} = \dfrac{11}{6} \approx 1.8333$ \\
-Within Salesmen (Error) & $300{,}000$ & $11$ & $MSW = 27{,}272.73$ & \\
-\midrule
-\textbf{Total} & $400{,}000$ & $13$ & & \\
+Between & $100{,}000$ & $k - 1 = 2$ & $50{,}000$ & $1.833$ \\
+Within & $300{,}000$ & $N - k = 11$ & $27{,}272.73$ & \\
+Total & $400{,}000$ & $N - 1 = 13$ & & \\
 \bottomrule
 \end{tabular}
 \end{center}
-\item \textbf{Decision:} Since $F = 1.833 < F_{0.05(2,11)} = 3.98$, we fail to reject $H_0$.
+\item \textbf{Decision:} Critical value at $\alpha = 0.05$: $F_{0.05,(2,11)} = 3.98$. Since $F_{\text{cal}} = 1.833 < 3.98$, we cannot reject $H_0$.
 \end{enumerate}
 \ans{$F = 1.833 < 3.98$; fail to reject $H_0$. The three salesmen's average weekly sales do not differ significantly at the $5\%$ level.}
 \end{solution}
@@ -2769,8 +2751,8 @@ In both papers, the given median ($415$ or $413.11$) lies inside the class $400\
 \begin{itemize}
 \item From (2): $415 - 400 = \dfrac{398 - f_1}{326}\times 25 \implies 398 - f_1 = \dfrac{15 \times 326}{25} = 195.6 \implies f_1 = 202.4 \approx \mathbf{202}$.
 \item From (1): $f_2 = 475 - 202 = \mathbf{273}$ (or $272.6$).
-\item \textbf{Mode:} The modal class is $400\text{--}425$ ($f_m = 326$, $f_{\text{prev}} = f_1 = 202$, $f_{\text{next}} = f_2 = 273$):
-\[ \text{Mode} = 400 + \frac{326 - 202}{2(326) - 202 - 273}\times 25 = 400 + \frac{124}{177}\times 25 = 400 + 17.51 = \mathbf{417.51}. \]
+\item \textbf{Mode:} The highest frequency $326$ lies in the class $400\text{--}425$, so the modal class is $400\text{--}425$ with $L = 400$, $h = 25$, $\Delta_1 = 326 - 202 = 124$ (modal minus pre-modal) and $\Delta_2 = 326 - 273 = 53$ (modal minus post-modal):
+\[ \text{Mode} = L + \frac{\Delta_1}{\Delta_1 + \Delta_2}\times h = 400 + \frac{124}{124 + 53}\times 25 = 400 + 17.51 = \mathbf{417.51}. \]
 \item \textbf{Shape:} Using midpoints, $\text{Mean} = \dfrac{\sum f_i x_i}{1000} = \dfrac{413{,}575}{1000} = 413.58 < \text{Median} = 415 < \text{Mode} = 417.51$, indicating a slightly \textbf{negatively (left) skewed} unimodal distribution.
 \end{itemize}
 
@@ -2779,8 +2761,8 @@ In both papers, the given median ($415$ or $413.11$) lies inside the class $400\
 \begin{itemize}
 \item From (2): $413.11 - 400 = \dfrac{398 - f_1}{326}\times 25 \implies 398 - f_1 = \dfrac{13.11 \times 326}{25} = 170.95 \implies f_1 = 227.05 \approx \mathbf{227}$.
 \item From (1): $f_2 = 475 - 227 = \mathbf{248}$.
-\item \textbf{Mode:} With $f_{\text{prev}} = 227$ and $f_{\text{next}} = 248$:
-\[ \text{Mode} = 400 + \frac{326 - 227}{2(326) - 227 - 248}\times 25 = 400 + \frac{99}{177}\times 25 = 400 + 13.98 = \mathbf{413.98}. \]
+\item \textbf{Mode:} Modal class $400\text{--}425$ ($L = 400$, $h = 25$), with $\Delta_1 = 326 - 227 = 99$ and $\Delta_2 = 326 - 248 = 78$:
+\[ \text{Mode} = L + \frac{\Delta_1}{\Delta_1 + \Delta_2}\times h = 400 + \frac{99}{99 + 78}\times 25 = 400 + 13.98 = \mathbf{413.98}. \]
 \end{itemize}
 \ans{2015--16 ($\text{Med}=415$): $f_1 = 202,\ f_2 = 273,\ \text{Mode} = 417.51$ (mean $413.58$, slightly negatively skewed). \quad 2014--15 ($\text{Med}=413.11$): $f_1 = 227,\ f_2 = 248,\ \text{Mode} = 413.98$.}
 \end{solution}
@@ -2983,10 +2965,13 @@ For $n = 10$ weeks:
 \begin{itemize}
 \item \textbf{Student X:} $\sum x_i = 610 \implies \bar{x} = \dfrac{610}{10} = 61.0$.
 \[ \sum (x_i - \bar{x})^2 = (-3)^2 + (-2)^2 + (-1)^2 + (-7)^2 + 4^2 + 5^2 + (-9)^2 + 14^2 + 8^2 + (-9)^2 = 526, \]
-\[ \sigma_X = \sqrt{\frac{526}{10}} \approx 7.2526 \quad (s_X = \sqrt{526/9} \approx 7.6449), \qquad \text{CV}_X = \frac{7.2526}{61.0}\times 100\% = 11.89\%. \]
-\item \textbf{Student Y:} $\sum y_i = 715 \implies \bar{y} = \dfrac{715}{10} = 71.5$.
-\[ \sum (y_i - \bar{y})^2 = \sum y_i^2 - \frac{(\sum y_i)^2}{10} = 52{,}833 - \frac{715^2}{10} = 52{,}833 - 51{,}122.5 = 1710.5, \]
-\[ \sigma_Y = \sqrt{\frac{1710.5}{10}} \approx 13.0786 \ (s_Y \approx 13.7861), \qquad \text{CV}_Y = \frac{13.0786}{71.5}\times 100\% = 18.29\%. \]
+\[ \sigma_X = \sqrt{\frac{\sum (x_i - \bar{x})^2}{N}} = \sqrt{\frac{526}{10}} \approx 7.2526, \]
+\[ \text{CV}_X = \frac{\sigma_X}{\bar{x}}\times 100 = \frac{7.2526}{61.0}\times 100 = 11.89\%. \]
+\item \textbf{Student Y:} $\sum y_i = 715 \implies \bar{y} = \dfrac{715}{10} = 71.5$. The deviations $y_i - \bar{y}$ are
+\[ 15.5,\ 17.5,\ 6.5,\ -0.5,\ 1.5,\ 12.5,\ -6.5,\ -5.5,\ -15.5,\ -25.5, \]
+so
+\[ \begin{aligned} \sum (y_i - \bar{y})^2 &= 240.25 + 306.25 + 42.25 + 0.25 + 2.25 \\ &\quad + 156.25 + 42.25 + 30.25 + 240.25 + 650.25 = 1710.5, \end{aligned} \]
+\[ \sigma_Y = \sqrt{\frac{1710.5}{10}} \approx 13.0786, \qquad \text{CV}_Y = \frac{13.0786}{71.5}\times 100 = 18.29\%. \]
 \end{itemize}
 \ans{(i) Student Y is the better scorer ($\bar{y} = 71.5 > \bar{x} = 61.0$); \quad (ii) Student X is more consistent ($\text{CV}_X = 11.89\% < \text{CV}_Y = 18.29\%$).}
 \end{solution}
@@ -3046,8 +3031,10 @@ Sorting B's 10 scores: $54, 55, 59, 63, 64, 66, 69, 74, 78, 85$.
 \begin{itemize}
 \item \textbf{Median ($Q_2$) \& Quartiles ($Q_1, Q_3$):}
 \[ Q_2 = \frac{64 + 66}{2} = 65.0, \quad Q_1 = 59.0 \ (58.0\text{ interp.}), \quad Q_3 = 74.0 \ (75.0\text{ interp.}). \]
-\item \textbf{Karl Pearson's Coefficient of Skewness (using Median):}
-\[ Sk_P = \frac{3(\bar{x}_B - \text{Median})}{\sigma_B} = \frac{3(66.7 - 65.0)}{9.4874} = \frac{5.1}{9.4874} \approx +0.5376. \]
+\item \textbf{Mode of B:} all ten scores of B are different, so no value repeats and the mode is found from the empirical relation $\text{Mode} = 3\,\text{Median} - 2\,\text{Mean}$:
+\[ \text{Mode} = 3(65.0) - 2(66.7) = 195.0 - 133.4 = 61.6. \]
+\item \textbf{Karl Pearson's Coefficient of Skewness:}
+\[ Sk_P = \frac{\text{Mean} - \text{Mode}}{\sigma_B} = \frac{66.7 - 61.6}{9.4874} = \frac{5.1}{9.4874} \approx +0.5376. \]
 \item \textbf{Moment Skewness \& Kurtosis of B:}
 $\mu_{3B} = \frac{1}{10}\sum (x_{Bi} - 66.7)^3 = 379.536$ and $\mu_{4B} = \frac{1}{10}\sum (x_{Bi} - 66.7)^4 = 17{,}983.33$:
 \[ \beta_1 = \frac{\mu_3^2}{\mu_2^3} \approx 0.1975 \ (\gamma_1 = +0.4444), \qquad \beta_2 = \frac{\mu_4}{\mu_2^2} \approx 2.2197 \ (\gamma_2 = -0.7803). \]
@@ -3076,9 +3063,9 @@ A time study was conducted in a factory with the help of two samples A and B con
 For $n = 7$ workers in each sample:
 \begin{itemize}
 \item \textbf{Sample A:} $\sum x_{Ai} = 920 \implies \bar{x}_A = \dfrac{920}{7} \approx 131.43\text{ minutes}$.
-\[ \sum (x_{Ai} - \bar{x}_A)^2 = 423.71 \implies \sigma_A \approx 7.7801\text{ min} \ (s_A = 8.4035), \quad \text{CV}_A = 5.92\%. \]
+\[ \sum (x_{Ai} - \bar{x}_A)^2 = 423.71 \implies \sigma_A = \sqrt{\frac{423.71}{7}} \approx 7.7801\text{ min}, \quad \text{CV}_A = 5.92\%. \]
 \item \textbf{Sample B:} $\sum x_{Bi} = 960 \implies \bar{x}_B = \dfrac{960}{7} \approx 137.14\text{ minutes}$.
-\[ \sum (x_{Bi} - \bar{x}_B)^2 = 160.86 \implies \sigma_B \approx 4.7937\text{ min} \ (s_B = 5.1778), \quad \text{CV}_B = 3.50\%. \]
+\[ \sum (x_{Bi} - \bar{x}_B)^2 = 160.86 \implies \sigma_B = \sqrt{\frac{160.86}{7}} \approx 4.7937\text{ min}, \quad \text{CV}_B = 3.50\%. \]
 \end{itemize}
 \ans{Sample A is more variable ($\text{CV}_A = 5.92\% > \text{CV}_B = 3.50\%$), and Sample A takes less time on average ($\bar{x}_A = 131.43\text{ min} < \bar{x}_B = 137.14\text{ min}$).}
 \end{solution}
@@ -3441,9 +3428,27 @@ A scatter plot (scatter diagram) is a two-dimensional graphical representation o
 \fig{\scatterfig}
 
 \textbf{3. Interpretation:}
-With $\bar{x} = 21.4$ and $\bar{y} = 3.6$, the corrected sums are $SS_x = 2403 - \frac{107^2}{5} = 113.2$, $SS_y = 65.5 - \frac{18^2}{5} = 0.70$, and $SP_{xy} = 390.5 - \frac{107 \times 18}{5} = 5.3$, so
-\[ r = \frac{SP_{xy}}{\sqrt{SS_x\,SS_y}} = \frac{5.3}{\sqrt{113.2 \times 0.70}} = \frac{5.3}{8.9017} \approx +0.595, \]
-and the least-squares trend line drawn in the plot is $\hat{y} = 2.598 + 0.0468x$.
+With $\bar{X} = \frac{107}{5} = 21.4$ and $\bar{Y} = \frac{18}{5} = 3.6$, Karl Pearson's coefficient is computed from the deviation table:
+\begin{center}\small
+\begin{tabular}{@{}ccccccc@{}}
+\toprule
+$X$ & $X-\bar{X}$ & $(X-\bar{X})^2$ & $Y$ & $Y-\bar{Y}$ & $(Y-\bar{Y})^2$ & $(X-\bar{X})(Y-\bar{Y})$ \\
+\midrule
+22 & $0.6$ & $0.36$ & 3.5 & $-0.1$ & $0.01$ & $-0.06$ \\
+29 & $7.6$ & $57.76$ & 4.0 & $0.4$ & $0.16$ & $3.04$ \\
+15 & $-6.4$ & $40.96$ & 3.0 & $-0.6$ & $0.36$ & $3.84$ \\
+18 & $-3.4$ & $11.56$ & 4.0 & $0.4$ & $0.16$ & $-1.36$ \\
+23 & $1.6$ & $2.56$ & 3.5 & $-0.1$ & $0.01$ & $-0.16$ \\
+\midrule
+$\sum X = 107$ & $\sum x = 0$ & $\sum x^2 = 113.2$ & $\sum Y = 18$ & $\sum y = 0$ & $\sum y^2 = 0.70$ & $\sum xy = 5.30$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\[ r = \frac{\sum xy}{\sqrt{\sum x^2}\sqrt{\sum y^2}} = \frac{5.30}{\sqrt{113.2 \times 0.70}} = \frac{5.30}{8.9017} \approx +0.595. \]
+The least-squares trend line drawn in the plot is $\hat{Y} = bX + a$ with
+\[ b = \frac{n\sum XY - \sum X\sum Y}{n\sum X^2 - (\sum X)^2} = \frac{5(390.5) - (107)(18)}{5(2403) - (107)^2} = \frac{26.5}{566} \approx 0.0468, \]
+\[ a = \bar{Y} - b\bar{X} = 3.6 - 0.0468(21.4) \approx 2.598, \]
+i.e.\ $\hat{y} = 2.598 + 0.0468x$.
 As restaurant price increases from $\$15$ (Restaurant C, rating $3.0$) to $\$29$ (Restaurant B, rating $4.0$), the ratings generally trend upward. Thus, there is a \textbf{moderate positive linear relationship} between price and rating, though Restaurant D ($\$18$, rating $4.0$) achieves a top rating at a relatively low price.
 \ans{The scatter plot shows a moderate positive association ($r \approx +0.595$) between restaurant price and rating.}
 \end{solution}
@@ -3531,7 +3536,7 @@ Tie-correction factor $CF$:
 \end{itemize}
 Total $CF = 7.5 + 3.5 = 11.0$. Substituting into the tied-rank formula:
 \[ r_S = 1 - \frac{6(42.0 + 11.0)}{10(10^2 - 1)} = 1 - \frac{6(53.0)}{990} = 1 - \frac{318}{990} = 1 - 0.3212 = 0.6788. \]
-\ans{Rank correlation coefficient $r_S = 0.6788$ (or $0.7275$ via exact Pearson correlation on the rank vectors).}
+\ans{Rank correlation coefficient (tie-adjusted Spearman) $r_S = 0.6788$.}
 \end{solution}
 
 %---------------------------------------------------------------- S032
@@ -3552,44 +3557,58 @@ Fit a second degree polynomial to the data and obtain coefficient of determinati
 \emph{Correlation analysis} quantifies the degree and direction of linear association between two variables via a dimensionless index $r \in [-1, 1]$. \emph{Regression analysis} establishes an explicit functional equation $\hat{y} = f(x)$ to predict or estimate the dependent variable $Y$ from known values of the independent variable $X$ and quantify the proportion of explained variance ($R^2$).
 
 \medskip
-\textbf{2. Fitting the Second-Degree Polynomial $\hat{y} = b_0 + b_1 x + b_2 x^2$ ($n = 6$):}
+\textbf{2. Fitting the Second-Degree Polynomial $\hat{Y} = a + b_1 X + b_2 X^2$ ($n = 6$):}
+Treat $X$ as $X_1$ and $X^2$ as $X_2$ of the multiple regression model, so the least-squares equations are
+\[ \begin{aligned} \textstyle\sum Y &= \textstyle na + b_1\sum X + b_2\sum X^2, \\ \textstyle\sum XY &= \textstyle a\sum X + b_1\sum X^2 + b_2\sum X^3, \\ \textstyle\sum X^2Y &= \textstyle a\sum X^2 + b_1\sum X^3 + b_2\sum X^4. \end{aligned} \]
 \begin{center}\small
-\begin{tabular}{@{}cccccccc|c@{}}
+\begin{tabular}{@{}ccccccc@{}}
 \toprule
-$x_i$ & $y_i$ & $x_i^2$ & $x_i^3$ & $x_i^4$ & $x_i y_i$ & $x_i^2 y_i$ & $\hat{y}_i$ & $(y_i - \hat{y}_i)^2$ \\
+N-Dose $(X)$ & Yield $(Y)$ & $X^2$ & $(X^2)^2$ & $X\,X^2$ & $XY$ & $X^2Y$ \\
 \midrule
-0 & 15 & 0 & 0 & 0 & 0 & 0 & $11.536$ & $12.001$ \\
-1 & 25 & 1 & 1 & 1 & 25 & 25 & $30.207$ & $27.114$ \\
-2 & 40 & 4 & 8 & 16 & 80 & 160 & $42.914$ & $8.493$ \\
-3 & 55 & 9 & 27 & 81 & 165 & 495 & $49.657$ & $28.546$ \\
-4 & 52 & 16 & 64 & 256 & 208 & 832 & $50.436$ & $2.447$ \\
-5 & 43 & 25 & 125 & 625 & 215 & 1075 & $45.250$ & $5.063$ \\
+0 & 15 & 0 & 0 & 0 & 0 & 0 \\
+1 & 25 & 1 & 1 & 1 & 25 & 25 \\
+2 & 40 & 4 & 16 & 8 & 80 & 160 \\
+3 & 55 & 9 & 81 & 27 & 165 & 495 \\
+4 & 52 & 16 & 256 & 64 & 208 & 832 \\
+5 & 43 & 25 & 625 & 125 & 215 & 1075 \\
 \midrule
-$\mathbf{15}$ & $\mathbf{230}$ & $\mathbf{55}$ & $\mathbf{225}$ & $\mathbf{979}$ & $\mathbf{693}$ & $\mathbf{2587}$ & $\mathbf{230.0}$ & $\mathbf{SSE = 83.664}$ \\
+$\mathbf{15}$ & $\mathbf{230}$ & $\mathbf{55}$ & $\mathbf{979}$ & $\mathbf{225}$ & $\mathbf{693}$ & $\mathbf{2587}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
-The least-squares normal equations for $\hat{y} = b_0 + b_1 x + b_2 x^2$ are:
-\[ \begin{cases}
-6b_0 + 15b_1 + 55b_2 = 230 \\
-15b_0 + 55b_1 + 225b_2 = 693 \\
-55b_0 + 225b_1 + 979b_2 = 2587
-\end{cases}
-\implies
-\begin{cases}
-b_0 = \dfrac{323}{28} \approx 11.5357 \\[4pt]
-b_1 = \dfrac{6063}{280} \approx 21.6536 \\[4pt]
-b_2 = -\dfrac{167}{56} \approx -2.9821.
-\end{cases} \]
+Sums of squares and products:
+\[ SS(X) = \sum X^2 - \frac{(\sum X)^2}{n} = 55 - \frac{15^2}{6} = 17.5, \]
+\[ SS(X^2) =\sum (X^2)^2 - \frac{(\sum X^2)^2}{n} = 979 - \frac{55^2}{6} = 474.8333, \]
+\[ SP(X\,X^2) = \sum X\,X^2 - \frac{\sum X\sum X^2}{n} = 225 - \frac{15 \times 55}{6} = 87.5, \qquad SP(XY) = 693 - \frac{15 \times 230}{6} = 118.0, \]
+\[ SP(X^2Y) = \sum X^2Y - \frac{\sum X^2\sum Y}{n} = 2587 - \frac{55 \times 230}{6} = 478.6667. \]
+Regression coefficients:
+\[ \begin{aligned} b_1 &= \frac{SS(X^2)\,SP(XY) - SP(X\,X^2)\,SP(X^2Y)}{SS(X)\,SS(X^2) - \{SP(X\,X^2)\}^2} = \frac{474.8333 \times 118 - 87.5 \times 478.6667}{17.5 \times 474.8333 - (87.5)^2} \\ &= \frac{14{,}147}{653.3333} \approx 21.6536, \end{aligned} \]
+\[ \begin{aligned} b_2 &= \frac{SS(X)\,SP(X^2Y) - SP(X\,X^2)\,SP(XY)}{SS(X)\,SS(X^2) - \{SP(X\,X^2)\}^2} = \frac{17.5 \times 478.6667 - 87.5 \times 118}{653.3333} \\ &= \frac{-1948.3333}{653.3333} \approx -2.9821, \end{aligned} \]
+\[ a = \bar{Y} - b_1\bar{X} - b_2\overline{X^2} = 38.3333 - 21.6536(2.5) + 2.9821(9.1667) \approx 11.5357. \]
 Hence, the fitted quadratic regression curve is:
-\[ \hat{y} = 11.5357 + 21.6536x - 2.9821x^2. \]
+\[ \hat{Y} = 11.5357 + 21.6536X - 2.9821X^2. \]
 
-\textbf{3. Coefficient of Determination ($R^2$):}
-With $\bar{y} = \dfrac{230}{6} \approx 38.3333$:
-\[ SST = \sum_{i=1}^{6} (y_i - \bar{y})^2 = \sum y_i^2 - \frac{(\sum y_i)^2}{6} = 10{,}028 - \frac{52{,}900}{6} = 1211.3333, \]
-\[ SSE = \sum_{i=1}^{6} (y_i - \hat{y}_i)^2 = 83.6643 \implies SSR = SST - SSE = 1127.6690, \]
-\[ R^2 = 1 - \frac{SSE}{SST} = \frac{1127.6690}{1211.3333} \approx 0.9309 \ (93.09\%). \]
-\ans{$\hat{y} = 11.5357 + 21.6536x - 2.9821x^2$; \qquad Coefficient of determination $R^2 = 0.9309$.}
+\textbf{3. Coefficient of Determination ($r^2 = SSR/SST$):}
+With $\bar{Y} = \dfrac{230}{6} = 38.3333$ and the fitted values $\hat{Y}_i$:
+\begin{center}\small
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$X_i$ & $Y_i$ & $\hat{Y}_i$ & $(Y_i - \bar{Y})^2$ & $(\hat{Y}_i - \bar{Y})^2$ \\
+\midrule
+0 & 15 & $11.5357$ & $544.4444$ & $718.1124$ \\
+1 & 25 & $30.2071$ & $177.7778$ & $66.0350$ \\
+2 & 40 & $42.9143$ & $2.7778$ & $20.9851$ \\
+3 & 55 & $49.6571$ & $277.7778$ & $128.2287$ \\
+4 & 52 & $50.4357$ & $186.7778$ & $146.4676$ \\
+5 & 43 & $45.2500$ & $21.7778$ & $47.8403$ \\
+\midrule
+ & & & $SST = 1211.3333$ & $SSR = 1127.6690$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\[ r^2 = \frac{SSR}{SST} = \frac{\sum(\hat{Y}_i - \bar{Y})^2}{\sum(Y_i - \bar{Y})^2} = \frac{1127.6690}{1211.3333} \approx 0.9309 \ (93.09\%), \]
+(so $SSE = SST - SSR = 83.6643$): about $93\%$ of the variation in yield is explained by the quadratic model.
+\ans{$\hat{Y} = 11.5357 + 21.6536X - 2.9821X^2$; \qquad Coefficient of determination $r^2 = 0.9309$.}
 \end{solution}
 
 %---------------------------------------------------------------- S033
@@ -3656,30 +3675,46 @@ From the data given below find out:
 Also, comment on Pearson's correlation coefficient between the above variables.
 \end{question}
 \begin{solution}
-For $n = 10$ couples:
-\[ \sum x_i = 260 \implies \bar{x} = 26.0, \qquad \sum y_i = 220 \implies \bar{y} = 22.0, \]
-\[ \sum x_i^2 = 6836, \qquad \sum y_i^2 = 4896, \qquad \sum x_i y_i = 5782. \]
-Centered sums of squares and cross-products:
-\[ SS_x = 6836 - \frac{260^2}{10} = 76.0, \qquad SS_y = 4896 - \frac{220^2}{10} = 56.0, \qquad SP_{xy} = 5782 - \frac{260 \times 220}{10} = 62.0. \]
-Regression coefficients:
-\[ b_{yx} = \frac{SP_{xy}}{SS_x} = \frac{62}{76} = \frac{31}{38} \approx 0.8158, \qquad b_{xy} = \frac{SP_{xy}}{SS_y} = \frac{62}{56} = \frac{31}{28} \approx 1.1071. \]
+Let $X$ = husband's age and $Y$ = wife's age ($n = 10$), with $\bar{X} = \frac{260}{10} = 26$ and $\bar{Y} = \frac{220}{10} = 22$. Writing $x = X - \bar{X}$ and $y = Y - \bar{Y}$:
+\begin{center}\small
+\begin{tabular}{@{}cccccccccc@{}}
+\toprule
+$X$ & $Y$ & $X^2$ & $Y^2$ & $XY$ & $x$ & $y$ & $x^2$ & $y^2$ & $xy$ \\
+\midrule
+22 & 18 & 484 & 324 & 396 & $-4$ & $-4$ & 16 & 16 & 16 \\
+23 & 20 & 529 & 400 & 460 & $-3$ & $-2$ & 9 & 4 & 6 \\
+23 & 21 & 529 & 441 & 483 & $-3$ & $-1$ & 9 & 1 & 3 \\
+24 & 20 & 576 & 400 & 480 & $-2$ & $-2$ & 4 & 4 & 4 \\
+26 & 21 & 676 & 441 & 546 & $0$ & $-1$ & 0 & 1 & 0 \\
+27 & 22 & 729 & 484 & 594 & $1$ & $0$ & 1 & 0 & 0 \\
+27 & 23 & 729 & 529 & 621 & $1$ & $1$ & 1 & 1 & 1 \\
+28 & 24 & 784 & 576 & 672 & $2$ & $2$ & 4 & 4 & 4 \\
+30 & 25 & 900 & 625 & 750 & $4$ & $3$ & 16 & 9 & 12 \\
+30 & 26 & 900 & 676 & 780 & $4$ & $4$ & 16 & 16 & 16 \\
+\midrule
+\textbf{260} & \textbf{220} & \textbf{6836} & \textbf{4896} & \textbf{5782} & \textbf{0} & \textbf{0} & \textbf{76} & \textbf{56} & \textbf{62} \\
+\bottomrule
+\end{tabular}
+\end{center}
 \begin{enumerate}[(i)]
 \item \textbf{The Two Linear Regression Equations:}
 \begin{itemize}
-\item \textbf{Regression of Wife's Age ($Y$) on Husband's Age ($X$):}
-\[ y - 22 = 0.8158(x - 26) \implies \hat{y} = 0.7895 + 0.8158x. \]
-\item \textbf{Regression of Husband's Age ($X$) on Wife's Age ($Y$):}
-\[ x - 26 = 1.1071(y - 22) \implies \hat{x} = 1.6429 + 1.1071y. \]
+\item \textbf{Regression of Wife's Age ($Y$) on Husband's Age ($X$), $\hat{Y} = bX + a$:}
+\[ b = \frac{n\sum XY - \sum X\sum Y}{n\sum X^2 - (\sum X)^2} = \frac{10(5782) - (260)(220)}{10(6836) - (260)^2} = \frac{620}{760} \approx 0.8158, \]
+\[ a = \bar{Y} - b\bar{X} = 22 - 0.8158(26) \approx 0.7895 \implies \hat{Y} = 0.8158X + 0.7895. \]
+\item \textbf{Regression of Husband's Age ($X$) on Wife's Age ($Y$), $\hat{X} = dY + c$:}
+\[ d = \frac{n\sum XY - \sum X\sum Y}{n\sum Y^2 - (\sum Y)^2} = \frac{10(5782) - (260)(220)}{10(4896) - (220)^2} = \frac{620}{560} \approx 1.1071, \]
+\[ c = \bar{X} - d\bar{Y} = 26 - 1.1071(22) \approx 1.6429 \implies \hat{X} = 1.1071Y + 1.6429. \]
 \end{itemize}
-\item \textbf{Most likely age of husband when wife's age is $y = 30$:}
-\[ \hat{x}(30) = 1.6429 + 1.1071(30) = 34.857 \approx 34.86\text{ years}. \]
-\item \textbf{Most likely age of wife when husband's age is $x = 25$:}
-\[ \hat{y}(25) = 0.7895 + 0.8158(25) = 21.184 \approx 21.18\text{ years}. \]
+\item \textbf{Most likely age of husband when wife's age is $Y = 30$:}
+\[ \hat{X}(30) = 1.1071(30) + 1.6429 = 34.857 \approx 34.86\text{ years}. \]
+\item \textbf{Most likely age of wife when husband's age is $X = 25$:}
+\[ \hat{Y}(25) = 0.8158(25) + 0.7895 = 21.184 \approx 21.18\text{ years}. \]
 \end{enumerate}
 \textbf{Pearson's Correlation Coefficient:}
-\[ r = \sqrt{b_{yx}\,b_{xy}} = \frac{62}{\sqrt{76 \times 56}} = \frac{62}{65.2380} \approx +0.9504, \]
+\[ r = \frac{\sum xy}{\sqrt{\sum x^2}\sqrt{\sum y^2}} = \frac{62}{\sqrt{76 \times 56}} = \frac{62}{65.2380} \approx +0.9504, \]
 which indicates a \textbf{very strong positive linear correlation} between the ages of husbands and wives.
-\ans{(i) $\hat{y} = 0.7895 + 0.8158x$ and $\hat{x} = 1.6429 + 1.1071y$; \quad (ii) $\hat{x}(30) = 34.86\text{ yrs}$; \quad (iii) $\hat{y}(25) = 21.18\text{ yrs}$; \quad $r = +0.9504$.}
+\ans{(i) $\hat{Y} = 0.8158X + 0.7895$ and $\hat{X} = 1.1071Y + 1.6429$; \quad (ii) $\hat{X}(30) = 34.86\text{ yrs}$; \quad (iii) $\hat{Y}(25) = 21.18\text{ yrs}$; \quad $r = +0.9504$.}
 \end{solution}
 
 %---------------------------------------------------------------- S035
@@ -3702,24 +3737,49 @@ In a forestry study of 15 loblolly pines, the resulting data on specific gravity
 (ii) Compute and interpret the sample correlation coefficient.
 \end{question}
 \begin{solution}
-From the $n = 15$ paired observations:
-\[ \sum x_i = 7.296 \implies \bar{x} = 0.4864, \qquad \sum y_i = 788{,}510 \implies \bar{y} = 52{,}567.3333, \]
-\[ \sum x_i^2 = 3.620132, \qquad \sum y_i^2 = 47{,}598{,}707{,}772, \qquad \sum x_i y_i = 403{,}686.826. \]
-Computing the corrected sums of squares and cross-products:
-\begin{align*}
-SS_x &= \sum x_i^2 - \frac{(\sum x_i)^2}{15} = 3.620132 - \frac{(7.296)^2}{15} = 3.620132 - 3.5487744 = 0.0713576, \\[4pt]
-SS_y &= \sum y_i^2 - \frac{(\sum y_i)^2}{15} = 47{,}598{,}707{,}772 - 41{,}449{,}868{,}006.67 = 6{,}148{,}839{,}765.33, \\[4pt]
-SP_{xy} &= \sum x_i y_i - \frac{(\sum x_i)(\sum y_i)}{15} = 403{,}686.826 - 383{,}531.264 = 20{,}155.562.
-\end{align*}
+With $X$ = specific gravity and $Y$ = modulus of rupture ($n = 15$):
+\begin{center}\small
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$X_i$ & $Y_i$ & $X_i^2$ & $Y_i^2$ & $X_iY_i$ \\
+\midrule
+0.414 & 29{,}186 & 0.171396 & 851{,}822{,}596 & 12{,}083.004 \\
+0.383 & 29{,}266 & 0.146689 & 856{,}498{,}756 & 11{,}208.878 \\
+0.399 & 26{,}215 & 0.159201 & 687{,}226{,}225 & 10{,}459.785 \\
+0.402 & 30{,}162 & 0.161604 & 909{,}746{,}244 & 12{,}125.124 \\
+0.442 & 38{,}867 & 0.195364 & 1{,}510{,}643{,}689 & 17{,}179.214 \\
+0.422 & 37{,}831 & 0.178084 & 1{,}431{,}184{,}561 & 15{,}964.682 \\
+0.466 & 44{,}576 & 0.217156 & 1{,}987{,}019{,}776 & 20{,}772.416 \\
+0.500 & 46{,}097 & 0.250000 & 2{,}124{,}933{,}409 & 23{,}048.500 \\
+0.514 & 59{,}698 & 0.264196 & 3{,}563{,}851{,}204 & 30{,}684.772 \\
+0.530 & 67{,}705 & 0.280900 & 4{,}583{,}967{,}025 & 35{,}883.650 \\
+0.569 & 66{,}088 & 0.323761 & 4{,}367{,}623{,}744 & 37{,}604.072 \\
+0.558 & 78{,}486 & 0.311364 & 6{,}160{,}052{,}196 & 43{,}795.188 \\
+0.577 & 89{,}869 & 0.332929 & 8{,}076{,}437{,}161 & 51{,}854.413 \\
+0.572 & 77{,}369 & 0.327184 & 5{,}985{,}962{,}161 & 44{,}255.068 \\
+0.548 & 67{,}095 & 0.300304 & 4{,}501{,}739{,}025 & 36{,}768.060 \\
+\midrule
+$\mathbf{7.296}$ & $\mathbf{788{,}510}$ & $\mathbf{3.620132}$ & $\mathbf{47{,}598{,}707{,}772}$ & $\mathbf{403{,}686.826}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+so $\bar{X} = \frac{7.296}{15} = 0.4864$ and $\bar{Y} = \frac{788{,}510}{15} = 52{,}567.3333$.
 \begin{enumerate}[(i)]
-\item \textbf{Both Regression Coefficients ($b_{yx}$ and $b_{xy}$):}
-\[ \begin{aligned} b_{yx} &= \frac{SP_{xy}}{SS_x} = \frac{20{,}155.562}{0.0713576} \approx \mathbf{282{,}458.52\text{ kPa/(g/cm}^3\text{)}}, \\ b_{xy} &= \frac{SP_{xy}}{SS_y} = \frac{20{,}155.562}{6{,}148{,}839{,}765.33} \approx \mathbf{3.2779 \times 10^{-6}\text{ (g/cm}^3\text{)/kPa}}. \end{aligned} \]
-\textit{(Note: If ``both regression coefficients'' refers to the intercept $\hat{\beta}_0$ and slope $\hat{\beta}_1$ of $Y$ on $X$, then $\hat{\beta}_1 = 282{,}458.52$ and $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x} = -84{,}820.49\text{ kPa}$.)}
+\item \textbf{Both Regression Coefficients ($b$ of $Y$ on $X$ and $d$ of $X$ on $Y$):}
+\[ \begin{aligned} n\textstyle\sum XY - \sum X\sum Y &= 15(403{,}686.826) - (7.296)(788{,}510) \\ &= 6{,}055{,}302.39 - 5{,}752{,}968.96 = 302{,}333.43, \end{aligned} \]
+\[ b = \frac{n\sum XY - \sum X\sum Y}{n\sum X^2 - (\sum X)^2} = \frac{302{,}333.43}{15(3.620132) - (7.296)^2} = \frac{302{,}333.43}{1.070364} \approx \mathbf{282{,}458.52}, \]
+\[ \begin{aligned} d &= \frac{n\sum XY - \sum X\sum Y}{n\sum Y^2 - (\sum Y)^2} = \frac{302{,}333.43}{15(47{,}598{,}707{,}772) - (788{,}510)^2} \\ &= \frac{302{,}333.43}{92{,}232{,}596{,}480} \approx \mathbf{3.2779 \times 10^{-6}}. \end{aligned} \]
+(Units: $b$ in kPa per g/cm$^3$, $d$ in g/cm$^3$ per kPa.)
+The corresponding lines are $\hat{Y} = bX + a$ with $a = \bar{Y} - b\bar{X} = 52{,}567.3333 - 282{,}458.52(0.4864) = -84{,}820.49$, and $\hat{X} = dY + c$ with $c = \bar{X} - d\bar{Y} = 0.4864 - (3.2779\times 10^{-6})(52{,}567.3333) = 0.3141$.
 \item \textbf{Sample Correlation Coefficient ($r$):}
-\[ r = \frac{SP_{xy}}{\sqrt{SS_x\,SS_y}} = \sqrt{b_{yx}\,b_{xy}} = \frac{20{,}155.562}{\sqrt{(0.0713576)(6{,}148{,}839{,}765.33)}} \approx \mathbf{+0.9622}. \]
+With deviations $x = X - \bar{X}$, $y = Y - \bar{Y}$:
+\[ \textstyle\sum x^2 = \sum X^2 - \frac{(\sum X)^2}{n} = 3.620132 - \frac{(7.296)^2}{15} = 0.0713576, \]
+\[ \textstyle\sum y^2 = \sum Y^2 - \frac{(\sum Y)^2}{n} = 47{,}598{,}707{,}772 - \frac{(788{,}510)^2}{15} = 6{,}148{,}839{,}765.33, \]
+\[ \textstyle\sum xy = \sum XY - \frac{\sum X\sum Y}{n} = 403{,}686.826 - 383{,}531.264 = 20{,}155.562, \]
+\[ r = \frac{\sum xy}{\sqrt{\sum x^2}\sqrt{\sum y^2}} = \frac{20{,}155.562}{\sqrt{(0.0713576)(6{,}148{,}839{,}765.33)}} \approx \mathbf{+0.9622}. \]
 \textbf{Interpretation:} $r = +0.9622$ ($R^2 = 92.59\%$) indicates a very strong positive linear relationship between wood specific gravity and modulus of rupture.
 \end{enumerate}
-\ans{(i) $b_{yx} = 282{,}458.52$, $b_{xy} = 3.2779 \times 10^{-6}$ (and intercept $a_{yx} = -84{,}820.49$); \quad (ii) $r = +0.9622$ (very strong positive linear correlation).}
+\ans{(i) $b = 282{,}458.52$ ($Y$ on $X$), $d = 3.2779 \times 10^{-6}$ ($X$ on $Y$); lines $\hat{Y} = 282{,}458.52X - 84{,}820.49$, $\hat{X} = 3.2779\times10^{-6}Y + 0.3141$; \quad (ii) $r = +0.9622$ (very strong positive linear correlation).}
 \end{solution}
 
 %---------------------------------------------------------------- S036 + S039 stacked
@@ -3745,22 +3805,50 @@ Given the exact same table of experience ($X$) and performance rating ($Y$) of 5
 \end{question}
 \begin{solution}
 For the $n = 5$ persons:
-\[ \sum x_i = 53 \implies \bar{x} = 10.6, \qquad \sum y_i = 390 \implies \bar{y} = 78.0, \]
-\[ \sum x_i^2 = 749, \qquad \sum y_i^2 = 31{,}222, \qquad \sum x_i y_i = 4496. \]
-Corrected sums of squares and cross-products:
-\[ SS_x = 749 - \frac{53^2}{5} = 187.2, \qquad SST = SS_y = 31{,}222 - \frac{390^2}{5} = 31{,}222 - 30{,}420 = 802.0, \]
-\[ SP_{xy} = 4496 - \frac{53 \times 390}{5} = 4496 - 4134 = 362.0. \]
+\begin{center}\small
+\begin{tabular}{@{}cccc@{}}
+\toprule
+$X_i$ & $Y_i$ & $X_i^2$ & $X_iY_i$ \\
+\midrule
+16 & 87 & 256 & 1392 \\
+12 & 88 & 144 & 1056 \\
+18 & 89 & 324 & 1602 \\
+4 & 68 & 16 & 272 \\
+3 & 58 & 9 & 174 \\
+\midrule
+$\sum X_i = 53$ & $\sum Y_i = 390$ & $\sum X_i^2 = 749$ & $\sum X_iY_i = 4496$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+so $\bar{X} = \frac{53}{5} = 10.6$ and $\bar{Y} = \frac{390}{5} = 78$.
 \begin{enumerate}[(i)]
-\item \textbf{Linear Regression Model of $Y$ on $X$ ($\hat{y} = a + bx$):}
-\[ b = \frac{SP_{xy}}{SS_x} = \frac{362.0}{187.2} \approx 1.9338, \qquad a = \bar{y} - b\bar{x} = 78.0 - (1.9338)(10.6) \approx 57.5021. \]
-Thus, the fitted linear model is $\hat{y} = 57.5021 + 1.9338x$.
+\item \textbf{Linear Regression Model of $Y$ on $X$ ($\hat{Y} = bX + a$):}
+\[ b = \frac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum X_i^2 - (\sum X_i)^2} = \frac{5(4496) - (53)(390)}{5(749) - (53)^2} = \frac{1810}{936} \approx 1.9338, \]
+\[ a = \bar{Y} - b\bar{X} = 78 - (1.9338)(10.6) \approx 57.5021. \]
+Thus, the fitted linear model is $\hat{Y} = 1.9338X + 57.5021$.
 \item \textbf{Sum of Squares for Regression ($SSR$) and Total Sum of Squares ($SST$):}
-\[ SST = SS_y = \mathbf{802.0}, \qquad SSR = \frac{(SP_{xy})^2}{SS_x} = \frac{(362.0)^2}{187.2} \approx \mathbf{700.0214} \quad (SSE = 101.9786). \]
-\item \textbf{Appropriateness of the Linear Model (Coefficient of Determination $R^2$):}
-\[ R^2 = \frac{SSR}{SST} = \frac{700.0214}{802.0} \approx 0.8728 \ (87.28\%). \]
-Since $87.28\%$ of the total variation in performance rating $Y$ is explained by linear regression on experience $X$ ($r = +0.9343$), the linear model provides a good fit and is appropriate for the data.
+\begin{center}\small
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$X_i$ & $Y_i$ & $\hat{Y}_i$ & $(Y_i - \bar{Y})^2$ & $(\hat{Y}_i - \bar{Y})^2$ \\
+\midrule
+16 & 87 & $88.4423$ & 81 & $109.0418$ \\
+12 & 88 & $80.7073$ & 100 & $7.3293$ \\
+18 & 89 & $92.3098$ & 121 & $204.7712$ \\
+4 & 68 & $65.2372$ & 100 & $162.8896$ \\
+3 & 58 & $63.3034$ & 400 & $215.9895$ \\
+\midrule
+ & & & $\mathbf{802}$ & $\mathbf{700.0214}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\[ SST = \sum (Y_i - \bar{Y})^2 = \mathbf{802.0}, \qquad SSR = \sum (\hat{Y}_i - \bar{Y})^2 \approx \mathbf{700.0214}, \]
+and $SSE = SST - SSR = 101.9786$.
+\item \textbf{Appropriateness of the Linear Model (Coefficient of Determination):}
+\[ r^2 = \frac{SSR}{SST} = \frac{\sum(\hat{Y}_i - \bar{Y})^2}{\sum(Y_i - \bar{Y})^2} = \frac{700.0214}{802.0} \approx 0.8728 \ (87.28\%). \]
+Since $r^2$ is close to 1 ($87.28\%$ of the total variation in performance rating $Y$ is explained by the linear regression on experience $X$), the linear model provides a good fit and is appropriate for the data.
 \end{enumerate}
-\ans{(i) $\hat{y} = 57.5021 + 1.9338x$; \quad (ii) $SSR = 700.02$, $SST = 802.00$; \quad (iii) Yes, $R^2 = 0.8728$ ($87.28\%$ of variation explained).}
+\ans{(i) $\hat{Y} = 1.9338X + 57.5021$; \quad (ii) $SSR = 700.02$, $SST = 802.00$; \quad (iii) Yes, $r^2 = 0.8728$ ($87.28\%$ of variation explained).}
 \end{solution}
 
 %---------------------------------------------------------------- S037
@@ -3778,17 +3866,34 @@ Find the regression line of $Y$ on $X$ and also predict what the signal strength
 \end{question}
 \begin{solution}
 For the $n = 10$ observations:
-\[ \sum x_i = 129 \implies \bar{x} = 12.90, \qquad \sum y_i = 336.6 \implies \bar{y} = 33.66, \]
-\[ \sum x_i^2 = 1851, \qquad \sum y_i^2 = 11{,}406.52, \qquad \sum x_i y_i = 4256.7. \]
-Corrected sums of squares and cross-products:
-\[ SS_x = 1851 - 1664.1 = 186.90, \qquad SP_{xy} = 4256.7 - 4342.14 = -85.44. \]
-Slope and intercept of the regression line of $Y$ on $X$:
-\[ b_{yx} = \frac{SP_{xy}}{SS_x} = \frac{-85.44}{186.90} \approx -0.45714, \qquad a_{yx} = \bar{y} - b_{yx}\bar{x} = 33.66 - (-0.45714)(12.90) \approx 39.5571. \]
+\begin{center}\small
+\begin{tabular}{@{}cccc@{}}
+\toprule
+$X_i$ & $Y_i$ & $X_i^2$ & $X_iY_i$ \\
+\midrule
+13 & 34.4 & 169 & 447.2 \\
+12 & 38.4 & 144 & 460.8 \\
+17 & 30.4 & 289 & 516.8 \\
+19 & 29.7 & 361 & 564.3 \\
+14 & 30.1 & 196 & 421.4 \\
+15 & 33.9 & 225 & 508.5 \\
+15 & 32.8 & 225 & 492.0 \\
+8 & 35.2 & 64 & 281.6 \\
+13 & 34.9 & 169 & 453.7 \\
+3 & 36.8 & 9 & 110.4 \\
+\midrule
+$\sum X_i = 129$ & $\sum Y_i = 336.6$ & $\sum X_i^2 = 1851$ & $\sum X_iY_i = 4256.7$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Slope and intercept of the regression line of $Y$ on $X$ ($\hat{Y} = bX + a$):
+\[ b = \frac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum X_i^2 - (\sum X_i)^2} = \frac{10(4256.7) - (129)(336.6)}{10(1851) - (129)^2} = \frac{-854.4}{1869} \approx -0.45714, \]
+\[ a = \bar{Y} - b\bar{X} = \frac{336.6}{10} + 0.45714\,\frac{129}{10} = 33.66 + 5.8971 \approx 39.5571. \]
 Thus, the regression line of $Y$ on $X$ is:
-\[ \hat{y} = 39.5571 - 0.4571x. \]
-Predicting the wireless signal strength at $x = 10\text{ meters}$:
-\[ \hat{y}(10) = 39.5571 - 0.45714(10) = 34.9857 \approx 34.99\text{ dB}. \]
-\ans{Regression line: $\hat{y} = 39.5571 - 0.4571x$; \qquad Predicted signal strength at $10\text{ m}$: $\hat{y}(10) = 34.99\text{ dB}$.}
+\[ \hat{Y} = -0.4571X + 39.5571. \]
+Predicting the wireless signal strength at $X = 10\text{ meters}$:
+\[ \hat{Y}(10) = -0.45714(10) + 39.5571 = 34.9857 \approx 34.99\text{ dB}. \]
+\ans{Regression line: $\hat{Y} = -0.4571X + 39.5571$; \qquad Predicted signal strength at $10\text{ m}$: $\hat{Y}(10) = 34.99\text{ dB}$.}
 \end{solution}
 
 %---------------------------------------------------------------- S038
@@ -3837,22 +3942,39 @@ Calculate the following:
 (ii) What initial start would you recommend for a person applying for a job after having served in a similar capacity in another factory for 15 years?
 \end{question}
 \begin{solution}
-For the $n = 9$ employees:
-\[ \sum x_i = 81 \implies \bar{x} = 9.0, \qquad \sum y_i = 130 \implies \bar{y} = \frac{130}{9} \approx 14.4444, \]
-\[ \sum x_i^2 = 789, \qquad \sum y_i^2 = 2082, \qquad \sum x_i y_i = 1280. \]
-Centered sums of squares and cross-products:
-\[ SS_x = 789 - \frac{81^2}{9} = 60.0, \qquad SS_y = 2082 - \frac{130^2}{9} = 204.2222, \qquad SP_{xy} = 1280 - \frac{81 \times 130}{9} = 110.0. \]
+For the $n = 9$ employees ($X$ = years of service, $Y$ = income in '000):
+\begin{center}\small
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$X_i$ & $Y_i$ & $X_i^2$ & $Y_i^2$ & $X_iY_i$ \\
+\midrule
+10 & 17 & 100 & 289 & 170 \\
+8 & 12 & 64 & 144 & 96 \\
+9 & 14 & 81 & 196 & 126 \\
+5 & 8 & 25 & 64 & 40 \\
+7 & 10 & 49 & 100 & 70 \\
+6 & 9 & 36 & 81 & 54 \\
+12 & 20 & 144 & 400 & 240 \\
+11 & 18 & 121 & 324 & 198 \\
+13 & 22 & 169 & 484 & 286 \\
+\midrule
+$\sum X_i=81$ & $\sum Y_i=130$ & $\sum X_i^2=789$ & $\sum Y_i^2=2082$ & $\sum X_iY_i=1280$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+so $\bar{X} = \frac{81}{9} = 9$ and $\bar{Y} = \frac{130}{9} = 14.4444$; also $n\sum X_iY_i - \sum X_i\sum Y_i = 9(1280) - (81)(130) = 990$.
 \begin{enumerate}[(i)]
 \item \textbf{Regression Equations and Correlation Coefficient:}
 \begin{itemize}
-\item $b_{yx} = \dfrac{110}{60} = \dfrac{11}{6} \approx 1.8333 \implies \hat{y} = 14.4444 + 1.8333(x - 9) = \mathbf{-2.0556 + 1.8333x}$.
-\item $b_{xy} = \dfrac{110}{204.2222} = \dfrac{990}{1838} \approx 0.5386 \implies \hat{x} = 9.0 + 0.5386(y - 14.4444) = \mathbf{1.2198 + 0.5386y}$.
-\item $r = \dfrac{SP_{xy}}{\sqrt{SS_x\,SS_y}} = \dfrac{110}{\sqrt{60 \times 204.2222}} \approx \mathbf{+0.9937}$.
+\item $Y$ on $X$: $b = \dfrac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum X_i^2 - (\sum X_i)^2} = \dfrac{990}{9(789) - (81)^2} = \dfrac{990}{540} \approx 1.8333$, \ $a = \bar{Y} - b\bar{X} = 14.4444 - 1.8333(9) = -2.0556$ $\implies \hat{Y} = \mathbf{1.8333X - 2.0556}$.
+\item $X$ on $Y$: $d = \dfrac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum Y_i^2 - (\sum Y_i)^2} = \dfrac{990}{9(2082) - (130)^2} = \dfrac{990}{1838} \approx 0.5386$, \ $c = \bar{X} - d\bar{Y} = 9 - 0.5386(14.4444) = 1.2198$ $\implies \hat{X} = \mathbf{0.5386Y + 1.2198}$.
+\item Correlation (deviations $x = X - \bar{X}$, $y = Y - \bar{Y}$): $\sum x^2 = 789 - \frac{81^2}{9} = 60$, \ $\sum y^2 = 2082 - \frac{130^2}{9} = 204.2222$, \ $\sum xy = 1280 - \frac{81 \times 130}{9} = 110$, so
+\[ r = \frac{\sum xy}{\sqrt{\sum x^2}\sqrt{\sum y^2}} = \frac{110}{\sqrt{60 \times 204.2222}} \approx \mathbf{+0.9937}. \]
 \end{itemize}
-\item \textbf{Recommended Starting Income for $x = 15\text{ years}$ of service:}
-\[ \hat{y}(15) = -2.0556 + 1.8333(15) = 25.4444\text{ ('000)} = \mathbf{25{,}444.44\text{ Tk.}} \]
+\item \textbf{Recommended Starting Income for $X = 15\text{ years}$ of service:}
+\[ \hat{Y}(15) = 1.8333(15) - 2.0556 = 25.4444\text{ ('000)} = \mathbf{25{,}444.44\text{ Tk.}} \]
 \end{enumerate}
-\ans{(i) $\hat{y} = -2.0556 + 1.8333x$, $\hat{x} = 1.2198 + 0.5386y$, $r = +0.9937$; \quad (ii) Recommended monthly income $= 25.44\text{ thousand}$ ($25{,}444.44\text{ Tk.}$).}
+\ans{(i) $\hat{Y} = 1.8333X - 2.0556$, $\hat{X} = 0.5386Y + 1.2198$, $r = +0.9937$; \quad (ii) Recommended monthly income $= 25.44\text{ thousand}$ ($25{,}444.44\text{ Tk.}$).}
 \end{solution}
 
 %---------------------------------------------------------------- S041
@@ -3870,15 +3992,31 @@ Find the regression line of $Y$ on $X$ and $X$ on $Y$. Find also the correlation
 \end{question}
 \begin{solution}
 For $n = 7$ observations:
-\[ \sum x_i = 452 \ (\bar{x} = 64.57), \ \sum y_i = 408 \ (\bar{y} = 58.29), \ \sum x_i^2 = 31{,}970, \ \sum y_i^2 = 24{,}312, \ \sum x_i y_i = 27{,}371. \]
-Centered sums of squares and cross-products:
-\[ SS_x = 2783.7143, \qquad SS_y = 531.4286, \qquad SP_{xy} = 1025.8571. \]
+\begin{center}\small
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$X_i$ & $Y_i$ & $X_i^2$ & $Y_i^2$ & $X_iY_i$ \\
+\midrule
+42 & 56 & 1764 & 3136 & 2352 \\
+44 & 49 & 1936 & 2401 & 2156 \\
+58 & 53 & 3364 & 2809 & 3074 \\
+55 & 58 & 3025 & 3364 & 3190 \\
+89 & 65 & 7921 & 4225 & 5785 \\
+98 & 76 & 9604 & 5776 & 7448 \\
+66 & 51 & 4356 & 2601 & 3366 \\
+\midrule
+$\sum X_i=452$ & $\sum Y_i=408$ & $\sum X_i^2=31{,}970$ & $\sum Y_i^2=24{,}312$ & $\sum X_iY_i=27{,}371$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+so $\bar{X} = \frac{452}{7} = 64.5714$, $\bar{Y} = \frac{408}{7} = 58.2857$, and $n\sum X_iY_i - \sum X_i\sum Y_i = 7(27{,}371) - (452)(408) = 7181$.
 \begin{itemize}
-\item \textbf{Regression line of $Y$ on $X$:} $b_{yx} = \dfrac{1025.8571}{2783.7143} \approx 0.3685 \implies \hat{y} = \mathbf{34.4898 + 0.3685x}$.
-\item \textbf{Regression line of $X$ on $Y$:} $b_{xy} = \dfrac{1025.8571}{531.4286} \approx 1.9304 \implies \hat{x} = \mathbf{-47.9419 + 1.9304y}$.
-\item \textbf{Correlation Coefficient:} $r = \sqrt{b_{yx}\,b_{xy}} = \dfrac{1025.8571}{\sqrt{(2783.7143)(531.4286)}} \approx \mathbf{+0.8434}$.
+\item \textbf{Regression line of $Y$ on $X$ ($\hat{Y} = bX + a$):} $b = \dfrac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum X_i^2 - (\sum X_i)^2} = \dfrac{7181}{7(31{,}970) - (452)^2} = \dfrac{7181}{19{,}486} \approx 0.3685$, \ $a = \bar{Y} - b\bar{X} = 58.2857 - 0.3685(64.5714) \approx 34.4898$ $\implies \hat{Y} = \mathbf{0.3685X + 34.4898}$.
+\item \textbf{Regression line of $X$ on $Y$ ($\hat{X} = dY + c$):} $d = \dfrac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum Y_i^2 - (\sum Y_i)^2} = \dfrac{7181}{7(24{,}312) - (408)^2} = \dfrac{7181}{3720} \approx 1.9304$, \ $c = \bar{X} - d\bar{Y} = 64.5714 - 1.9304(58.2857) \approx -47.9419$ $\implies \hat{X} = \mathbf{1.9304Y - 47.9419}$.
+\item \textbf{Correlation Coefficient} (deviations $x = X - \bar{X}$, $y = Y - \bar{Y}$): $\sum x^2 = 31{,}970 - \frac{452^2}{7} = 2783.7143$, \ $\sum y^2 = 24{,}312 - \frac{408^2}{7} = 531.4286$, \ $\sum xy = 27{,}371 - \frac{452 \times 408}{7} = 1025.8571$,
+\[ r = \frac{\sum xy}{\sqrt{\sum x^2}\sqrt{\sum y^2}} = \frac{1025.8571}{\sqrt{(2783.7143)(531.4286)}} \approx \mathbf{+0.8434}. \]
 \end{itemize}
-\ans{$Y$ on $X$: $\hat{y} = 34.4898 + 0.3685x$; \quad $X$ on $Y$: $\hat{x} = -47.9419 + 1.9304y$; \quad $r = +0.8434$.}
+\ans{$Y$ on $X$: $\hat{Y} = 0.3685X + 34.4898$; \quad $X$ on $Y$: $\hat{X} = 1.9304Y - 47.9419$; \quad $r = +0.8434$.}
 \end{solution}
 
 %---------------------------------------------------------------- S042
@@ -3895,18 +4033,35 @@ Calculate the two regression equations and the coefficient of correlation from t
 Also estimate the most likely age of husband when wife's age is 24.
 \end{question}
 \begin{solution}
-For $n = 8$ couples:
-\[ \sum x_i = 249 \ (\bar{x} = 31.125), \ \sum y_i = 205 \ (\bar{y} = 25.625), \ \sum x_i^2 = 7993, \ \sum y_i^2 = 5489, \ \sum x_i y_i = 6601. \]
-Centered sums of squares and cross-products:
-\[ SS_x = 242.875, \qquad SS_y = 235.875, \qquad SP_{xy} = 220.375. \]
+For $n = 8$ couples ($X$ = husband's age, $Y$ = wife's age):
+\begin{center}\small
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$X_i$ & $Y_i$ & $X_i^2$ & $Y_i^2$ & $X_iY_i$ \\
+\midrule
+22 & 19 & 484 & 361 & 418 \\
+25 & 18 & 625 & 324 & 450 \\
+28 & 22 & 784 & 484 & 616 \\
+31 & 29 & 961 & 841 & 899 \\
+35 & 31 & 1225 & 961 & 1085 \\
+32 & 23 & 1024 & 529 & 736 \\
+37 & 30 & 1369 & 900 & 1110 \\
+39 & 33 & 1521 & 1089 & 1287 \\
+\midrule
+$\sum X_i=249$ & $\sum Y_i=205$ & $\sum X_i^2=7993$ & $\sum Y_i^2=5489$ & $\sum X_iY_i=6601$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+so $\bar{X} = \frac{249}{8} = 31.125$, $\bar{Y} = \frac{205}{8} = 25.625$, and $n\sum X_iY_i - \sum X_i\sum Y_i = 8(6601) - (249)(205) = 1763$.
 \begin{itemize}
-\item \textbf{Regression of $Y$ on $X$:} $b_{yx} = \dfrac{220.375}{242.875} \approx 0.9074 \implies \hat{y} = \mathbf{-2.6166 + 0.9074x}$.
-\item \textbf{Regression of $X$ on $Y$:} $b_{xy} = \dfrac{220.375}{235.875} \approx 0.9343 \implies \hat{x} = \mathbf{7.1839 + 0.9343y}$.
-\item \textbf{Correlation Coefficient:} $r = \dfrac{220.375}{\sqrt{242.875 \times 235.875}} \approx \mathbf{+0.9207}$.
-\item \textbf{Estimated Age of Husband when Wife's Age is $y = 24$:}
-\[ \hat{x}(24) = 7.1839 + 0.9343(24) = \mathbf{29.61\text{ years}}. \]
+\item \textbf{Regression of $Y$ on $X$ ($\hat{Y} = bX + a$):} $b = \dfrac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum X_i^2 - (\sum X_i)^2} = \dfrac{1763}{8(7993) - (249)^2} = \dfrac{1763}{1943} \approx 0.9074$, \ $a = \bar{Y} - b\bar{X} = 25.625 - 0.9074(31.125) \approx -2.6166$ $\implies \hat{Y} = \mathbf{0.9074X - 2.6166}$.
+\item \textbf{Regression of $X$ on $Y$ ($\hat{X} = dY + c$):} $d = \dfrac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum Y_i^2 - (\sum Y_i)^2} = \dfrac{1763}{8(5489) - (205)^2} = \dfrac{1763}{1887} \approx 0.9343$, \ $c = \bar{X} - d\bar{Y} = 31.125 - 0.9343(25.625) \approx 7.1839$ $\implies \hat{X} = \mathbf{0.9343Y + 7.1839}$.
+\item \textbf{Correlation Coefficient} (deviations $x = X - \bar{X}$, $y = Y - \bar{Y}$): $\sum x^2 = 7993 - \frac{249^2}{8} = 242.875$, \ $\sum y^2 = 5489 - \frac{205^2}{8} = 235.875$, \ $\sum xy = 6601 - \frac{249 \times 205}{8} = 220.375$,
+\[ r = \frac{\sum xy}{\sqrt{\sum x^2}\sqrt{\sum y^2}} = \frac{220.375}{\sqrt{242.875 \times 235.875}} \approx \mathbf{+0.9207}. \]
+\item \textbf{Estimated Age of Husband when Wife's Age is $Y = 24$} (use $X$ on $Y$):
+\[ \hat{X}(24) = 0.9343(24) + 7.1839 = \mathbf{29.61\text{ years}}. \]
 \end{itemize}
-\ans{$\hat{y} = -2.6166 + 0.9074x$, \ $\hat{x} = 7.1839 + 0.9343y$, \ $r = +0.9207$, \ and $\hat{x}(24) = 29.61\text{ years}$.}
+\ans{$\hat{Y} = 0.9074X - 2.6166$, \ $\hat{X} = 0.9343Y + 7.1839$, \ $r = +0.9207$, \ and $\hat{X}(24) = 29.61\text{ years}$.}
 \end{solution}
 
 %---------------------------------------------------------------- S043
@@ -3923,22 +4078,44 @@ Calculate two regression equations and regression coefficients from the data giv
 Estimate the marks in economics if a student has scored 36 in business and the mark in business if another student has scored 44 in economics. Also comment on the correlation of the above mentioned marks obtained in economics and business.
 \end{question}
 \begin{solution}
-For $n = 10$ students:
-\[ \sum x_i = 375 \ (\bar{x} = 37.5), \ \sum y_i = 357 \ (\bar{y} = 35.7), \ \sum x_i^2 = 14{,}363, \ \sum y_i^2 = 12{,}939, \ \sum x_i y_i = 13{,}461. \]
-Centered sums of squares and cross-products:
-\[ SS_x = 300.50, \qquad SS_y = 194.10, \qquad SP_{xy} = 73.50. \]
+For $n = 10$ students ($X$ = Economics, $Y$ = Business):
+\begin{center}\small
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$X_i$ & $Y_i$ & $X_i^2$ & $Y_i^2$ & $X_iY_i$ \\
+\midrule
+47 & 38 & 2209 & 1444 & 1786 \\
+38 & 34 & 1444 & 1156 & 1292 \\
+34 & 42 & 1156 & 1764 & 1428 \\
+44 & 39 & 1936 & 1521 & 1716 \\
+32 & 34 & 1024 & 1156 & 1088 \\
+41 & 33 & 1681 & 1089 & 1353 \\
+35 & 30 & 1225 & 900 & 1050 \\
+32 & 41 & 1024 & 1681 & 1312 \\
+42 & 38 & 1764 & 1444 & 1596 \\
+30 & 28 & 900 & 784 & 840 \\
+\midrule
+$\sum X_i=375$ & $\sum Y_i=357$ & $\sum X_i^2=14{,}363$ & $\sum Y_i^2=12{,}939$ & $\sum X_iY_i=13{,}461$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+so $\bar{X} = 37.5$, $\bar{Y} = 35.7$, and $n\sum X_iY_i - \sum X_i\sum Y_i = 10(13{,}461) - (375)(357) = 735$.
 \begin{itemize}
-\item \textbf{Regression Coefficients:} $b_{yx} = \dfrac{73.50}{300.50} \approx \mathbf{0.2446}$, \qquad $b_{xy} = \dfrac{73.50}{194.10} \approx \mathbf{0.3787}$.
-\item \textbf{Regression Equations:}
-\[ Y\text{ on }X:\ \hat{y} = \mathbf{26.5278 + 0.2446x}, \qquad X\text{ on }Y:\ \hat{x} = \mathbf{23.9815 + 0.3787y}. \]
+\item \textbf{Regression Coefficients:}
+\[ b = \frac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum X_i^2 - (\sum X_i)^2} = \frac{735}{10(14{,}363) - (375)^2} = \frac{735}{3005} \approx \mathbf{0.2446}, \]
+\[ d =\frac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum Y_i^2 - (\sum Y_i)^2} = \frac{735}{10(12{,}939) - (357)^2} = \frac{735}{1941} \approx \mathbf{0.3787}. \]
+\item \textbf{Regression Equations:} $a = \bar{Y} - b\bar{X} = 35.7 - 0.2446(37.5) = 26.5278$ and $c = \bar{X} - d\bar{Y} = 37.5 - 0.3787(35.7) = 23.9815$, so
+\[ Y\text{ on }X:\ \hat{Y} = \mathbf{0.2446X + 26.5278}, \qquad X\text{ on }Y:\ \hat{X} = \mathbf{0.3787Y + 23.9815}. \]
 \item \textbf{Predictions:}
 \begin{itemize}
-\item Estimated Economics mark when Business mark is $y = 36$: $\hat{x}(36) = 23.9815 + 0.3787(36) = \mathbf{37.61}$.
-\item Estimated Business mark when Economics mark is $x = 44$: $\hat{y}(44) = 26.5278 + 0.2446(44) = \mathbf{37.29}$.
+\item Estimated Economics mark when Business mark is $Y = 36$: $\hat{X}(36) = 0.3787(36) + 23.9815 = \mathbf{37.61}$.
+\item Estimated Business mark when Economics mark is $X = 44$: $\hat{Y}(44) = 0.2446(44) + 26.5278 = \mathbf{37.29}$.
 \end{itemize}
-\item \textbf{Correlation Comment:} $r = \sqrt{b_{yx}\,b_{xy}} = \dfrac{73.50}{\sqrt{300.50 \times 194.10}} \approx \mathbf{+0.3043}$, indicating a \textbf{weak positive linear correlation} between marks in Economics and Business.
+\item \textbf{Correlation Comment} (deviations $x = X - \bar{X}$, $y = Y - \bar{Y}$): $\sum x^2 = 14{,}363 - \frac{375^2}{10} = 300.5$, \ $\sum y^2 = 12{,}939 - \frac{357^2}{10} = 194.1$, \ $\sum xy = 13{,}461 - \frac{375 \times 357}{10} = 73.5$,
+\[ r = \frac{\sum xy}{\sqrt{\sum x^2}\sqrt{\sum y^2}} = \frac{73.5}{\sqrt{300.5 \times 194.1}} \approx \mathbf{+0.3043}, \]
+indicating a \textbf{weak positive linear correlation} between marks in Economics and Business.
 \end{itemize}
-\ans{$b_{yx} = 0.2446,\ b_{xy} = 0.3787$; \ $\hat{y} = 26.53 + 0.2446x,\ \hat{x} = 23.98 + 0.3787y$; \ $\hat{x}(36) = 37.61,\ \hat{y}(44) = 37.29$; \ $r = +0.3043$ (weak positive correlation).}
+\ans{$b = 0.2446,\ d = 0.3787$; \ $\hat{Y} = 0.2446X + 26.53,\ \hat{X} = 0.3787Y + 23.98$; \ $\hat{X}(36) = 37.61,\ \hat{Y}(44) = 37.29$; \ $r = +0.3043$ (weak positive correlation).}
 \end{solution}
 
 %---------------------------------------------------------------- S044
@@ -3955,20 +4132,37 @@ Find the two regression lines and the coefficient of correlation from the table 
 \end{question}
 \begin{solution}
 For $n = 9$ observations:
-\[ \sum x_i = 994 \ (\bar{x} = 110.44), \quad \sum y_i = 493 \ (\bar{y} = 54.78), \]
-\[ \sum x_i^2 = 109{,}980, \quad \sum y_i^2 = 27{,}403, \quad \sum x_i y_i = 54{,}324. \]
-Centered sums of squares and cross-products:
-\[ SS_x = 198.2222, \qquad SS_y = 397.5556, \qquad SP_{xy} = -125.1111. \]
+\begin{center}\small
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$X_i$ & $Y_i$ & $X_i^2$ & $Y_i^2$ & $X_iY_i$ \\
+\midrule
+105 & 58 & 11{,}025 & 3364 & 6090 \\
+112 & 56 & 12{,}544 & 3136 & 6272 \\
+104 & 47 & 10{,}816 & 2209 & 4888 \\
+114 & 46 & 12{,}996 & 2116 & 5244 \\
+117 & 51 & 13{,}689 & 2601 & 5967 \\
+108 & 64 & 11{,}664 & 4096 & 6912 \\
+106 & 66 & 11{,}236 & 4356 & 6996 \\
+117 & 50 & 13{,}689 & 2500 & 5850 \\
+111 & 55 & 12{,}321 & 3025 & 6105 \\
+\midrule
+$\sum X_i=994$ & $\sum Y_i=493$ & $\sum X_i^2=109{,}980$ & $\sum Y_i^2=27{,}403$ & $\sum X_iY_i=54{,}324$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+so $\bar{X} = \frac{994}{9} = 110.4444$, $\bar{Y} = \frac{493}{9} = 54.7778$, and $n\sum X_iY_i - \sum X_i\sum Y_i = 9(54{,}324) - (994)(493) = -1126$.
 \begin{itemize}
-\item \textbf{Regression line of $Y$ on $X$:} $b_{yx} = \dfrac{-125.1111}{198.2222} \approx -0.6312 \implies \hat{y} = \mathbf{124.4865 - 0.6312x}$.
-\item \textbf{Regression line of $X$ on $Y$:} $b_{xy} = \dfrac{-125.1111}{397.5556} \approx -0.3147 \implies \hat{x} = \mathbf{127.6831 - 0.3147y}$.
-\item \textbf{Coefficient of Correlation:} $r = -\sqrt{b_{yx}\,b_{xy}} = \dfrac{-125.1111}{\sqrt{(198.2222)(397.5556)}} \approx \mathbf{-0.4457}$.
+\item \textbf{Regression line of $Y$ on $X$ ($\hat{Y} = bX + a$):} $b = \dfrac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum X_i^2 - (\sum X_i)^2} = \dfrac{-1126}{9(109{,}980) - (994)^2} = \dfrac{-1126}{1784} \approx -0.6312$, \ $a = \bar{Y} - b\bar{X} = 54.7778 + 0.6312(110.4444) \approx 124.4865$ $\implies \hat{Y} = \mathbf{-0.6312X + 124.4865}$.
+\item \textbf{Regression line of $X$ on $Y$ ($\hat{X} = dY + c$):} $d = \dfrac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum Y_i^2 - (\sum Y_i)^2} = \dfrac{-1126}{9(27{,}403) - (493)^2} = \dfrac{-1126}{3578} \approx -0.3147$, \ $c = \bar{X} - d\bar{Y} = 110.4444 + 0.3147(54.7778) \approx 127.6831$ $\implies \hat{X} = \mathbf{-0.3147Y + 127.6831}$.
+\item \textbf{Coefficient of Correlation} (deviations $x = X - \bar{X}$, $y = Y - \bar{Y}$): $\sum x^2 = 109{,}980 - \frac{994^2}{9} = 198.2222$, \ $\sum y^2 = 27{,}403 - \frac{493^2}{9} = 397.5556$, \ $\sum xy = 54{,}324 - \frac{994 \times 493}{9} = -125.1111$,
+\[ r = \frac{\sum xy}{\sqrt{\sum x^2}\sqrt{\sum y^2}} = \frac{-125.1111}{\sqrt{(198.2222)(397.5556)}} \approx \mathbf{-0.4457}. \]
 \end{itemize}
-\ans{$Y$ on $X$: $\hat{y} = 124.4865 - 0.6312x$; \quad $X$ on $Y$: $\hat{x} = 127.6831 - 0.3147y$; \quad $r = -0.4457$.}
+\ans{$Y$ on $X$: $\hat{Y} = -0.6312X + 124.4865$; \quad $X$ on $Y$: $\hat{X} = -0.3147Y + 127.6831$; \quad $r = -0.4457$.}
 \end{solution}
 
 %===================================================================== TOPIC 18
-\topic[Out of Syllabus]{18}{Out of Syllabus (CLT, Negative Binomial, Exponential Process, Sampling)}
+\topic[Out of Syllabus]{18}{Out of Syllabus (CLT, Two-Way ANOVA, Neg.~Binomial, Exponential, Sampling)}
 
 %---------------------------------------------------------------- X001
 \begin{question}{2023--2024 \textbullet\ Q6(b)}{MATH 243 \textbullet\ 21/05/2026 \textbullet\ X001}{10}
@@ -4002,7 +4196,65 @@ Let $X_1, X_2, \dots, X_n$ be a random sample of size $n$ drawn from any populat
 \end{solution}
 
 %---------------------------------------------------------------- X002
-\begin{question}{2020--2021 \textbullet\ Q6(c)}{MATH 245 \textbullet\ 2020--2021 \textbullet\ X002}{10}
+\begin{question}{2022--2023 \textbullet\ Q8(c)}{MATH 243 \textbullet\ 01/02/2025 \textbullet\ X002}{15}
+Seeds of four different types of corn are planted in five blocks. Each block is divided into four plots, which are then randomly assigned to the four types of corn. Determine at the 0.05 significance level whether the yields in bushels per acre, as shown in the following Table, vary significantly with differences in (i) the soil (i.e., the five blocks) and (ii) the type of corn. (Necessary charts are attached).
+\begin{center}\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+& \textbf{Type I} & \textbf{Type II} & \textbf{Type III} & \textbf{Type IV} \\
+\midrule
+Block A & 12 & 15 & 10 & 14 \\
+Block B & 15 & 19 & 12 & 11 \\
+Block C & 14 & 18 & 15 & 12 \\
+Block D & 11 & 16 & 12 & 16 \\
+Block E & 16 & 17 & 11 & 14 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{question}
+\begin{solution}
+This is a Randomized Complete Block Design (two-way ANOVA without interaction) with $b = 5$ blocks (rows) and $k = 4$ corn types (columns), giving $N = bk = 20$ observations.
+\begin{enumerate}[1.]
+\item \textbf{Row (Block) Means, Column (Treatment) Means, and Grand Mean:}
+\begin{itemize}
+\item \textbf{Block Totals ($R_i$) \& Means ($\bar{x}_{i\cdot} = R_i/4$):}
+Block A: $51\ (12.75)$;\quad Block B: $57\ (14.25)$;\quad Block C: $59\ (14.75)$;\quad Block D: $55\ (13.75)$;\quad Block E: $58\ (14.50)$.
+\item \textbf{Corn Type Totals ($C_j$) \& Means ($\bar{x}_{\cdot j} = C_j/5$):}
+Type I: $68\ (13.60)$;\quad Type II: $85\ (17.00)$;\quad Type III: $60\ (12.00)$;\quad Type IV: $67\ (13.40)$.
+\item \textbf{Grand Total \& Grand Mean:} $G = 280 \implies \bar{\bar{x}} = \dfrac{280}{20} = 14.0$.
+\end{itemize}
+\item \textbf{Sums of Squares:}
+\begin{align*}
+SST &= \sum_{i=1}^{5}\sum_{j=1}^{4} (x_{ij} - 14.0)^2 = \sum x_{ij}^2 - \frac{G^2}{20} = 4044 - \frac{280^2}{20} = 4044 - 3920 = 124.0, \\[4pt]
+SS_{\text{Blocks}} &= 4\sum_{i=1}^{5} (\bar{x}_{i\cdot} - 14.0)^2 = \frac{51^2 + 57^2 + 59^2 + 55^2 + 58^2}{4} - 3920 = 3930 - 3920 = 10.0, \\[4pt]
+SS_{\text{Corn}} &= 5\sum_{j=1}^{4} (\bar{x}_{\cdot j} - 14.0)^2 = \frac{68^2 + 85^2 + 60^2 + 67^2}{5} - 3920 = 3987.6 - 3920 = 67.6, \\[4pt]
+SSE &= SST - SS_{\text{Blocks}} - SS_{\text{Corn}} = 124.0 - 10.0 - 67.6 = 46.4.
+\end{align*}
+\item \textbf{Two-Way ANOVA Table:}
+\begin{center}\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Source of Variation} & \textbf{SS} & \textbf{df} & \textbf{MS} & \textbf{$F$-Ratio} & \textbf{Critical $F_{0.05}$} \\
+\midrule
+Blocks (Soil) & $10.0$ & $b - 1 = 4$ & $2.5000$ & $F_B = \dfrac{2.5000}{3.8667} = 0.6466$ & $F_{0.05(4,12)} = 3.26$ \\
+Corn Types & $67.6$ & $k - 1 = 3$ & $22.5333$ & $F_C = \dfrac{22.5333}{3.8667} = 5.8276$ & $F_{0.05(3,12)} = 3.49$ \\
+Error (Residual) & $46.4$ & $(b-1)(k-1) = 12$ & $3.8667$ & & \\
+\midrule
+\textbf{Total} & $124.0$ & $N - 1 = 19$ & & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+\item \textbf{Conclusions at $\alpha = 0.05$:}
+\begin{enumerate}[(i)]
+\item \textbf{Soil (Blocks):} Since $F_B = 0.65 < F_{0.05(4,12)} = 3.26$, fail to reject $H_{0B}$ (yields do not vary significantly across soil blocks).
+\item \textbf{Type of Corn:} Since $F_C = 5.83 > F_{0.05(3,12)} = 3.49$, reject $H_{0C}$ (yields vary significantly among the four types of corn).
+\end{enumerate}
+\end{enumerate}
+\ans{(i) Soil blocks: $F = 0.65 < 3.26$ (not significant); \qquad (ii) Corn types: $F = 5.83 > 3.49$ (significant difference at $\alpha = 0.05$).}
+\end{solution}
+
+%---------------------------------------------------------------- X003
+\begin{question}{2020--2021 \textbullet\ Q6(c)}{MATH 245 \textbullet\ 2020--2021 \textbullet\ X003}{10}
 In a sociological study, about two-thirds of the 20 million persons who take Valium are women. Assuming this figure to be a valid estimate, find the probability that on a given day the fifth prescription written by a doctor for Valium is:
 (i) the first prescribing Valium for a woman,
 (ii) the third prescribing Valium for a woman.
@@ -4022,8 +4274,8 @@ Exactly 2 of the first 4 prescriptions must be for women, and the 5th must be fo
 \ans{(i) $\dfrac{2}{243} \approx 0.00823$, \qquad (ii) $\dfrac{16}{81} \approx 0.19753$.}
 \end{solution}
 
-%---------------------------------------------------------------- X003
-\begin{question}{2019--2020 \textbullet\ Q8(b)}{MATH 245 \textbullet\ 25/09/2021 \textbullet\ X003}{25}
+%---------------------------------------------------------------- X004
+\begin{question}{2019--2020 \textbullet\ Q8(b)}{MATH 245 \textbullet\ 25/09/2021 \textbullet\ X004}{25}
 Suppose that the time between emergency calls to a small suburban fire station follows an exponential distribution with an average rate of 1.8 calls per day.
 (i) A fireman has just clocked on. What is the chance of a call in the next 15 minutes?
 (ii) The fireman has nearly finished his shift: 15 minutes to go, and there has been no call during his shift so far. What is the chance of a call in the next 15 minutes?
@@ -4055,8 +4307,8 @@ By the \textbf{memoryless property} of the exponential distribution, $P(T \le s 
 \ans{(i) $0.0186$; \quad (ii) $0.0186$ (memoryless); \quad (iii) $e^{-0.75} \approx 0.4724$; \quad (iv) $e^{-3.0} \approx 0.0498$ (4 shifts) or $e^{-7.2} \approx 0.00075$ (4 full days); \quad (v) $x = 1.4\text{ hours}$.}
 \end{solution}
 
-%---------------------------------------------------------------- X004
-\begin{question}{2016--2017 \textbullet\ Q7(c)}{MATH 245 \textbullet\ 05/08/2017 \textbullet\ X004}{15}
+%---------------------------------------------------------------- X005
+\begin{question}{2016--2017 \textbullet\ Q7(c)}{MATH 245 \textbullet\ 05/08/2017 \textbullet\ X005}{15}
 The masses of 1500 ball bearings are normally distributed, with a mean of 22.40 g and a standard deviation of 0.048 g. If 300 random samples of size 36 are drawn from this population, determine the expected mean and standard deviation of the sampling distribution of means if the sampling is done with replacement and without replacement. How many of the random samples would have their means (i) between 22.39 and 22.41 g, (ii) greater than 22.42 g, and (iii) less than 22.38 g or more than 22.41 g? (Necessary table attached).
 \end{question}
 \begin{solution}
